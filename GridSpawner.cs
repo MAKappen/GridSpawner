@@ -269,14 +269,7 @@ public class GridSpawner : EditorWindow
 
                             xPos += sizeCell / 2 + gutterGrid;
                         }
-                        if (triangleUp)
-                        {
-                            triangleUp = false;
-                        }
-                        else
-                        {
-                            triangleUp = true;
-                        }
+                        triangleUp = !triangleUp;
                         xPos = 0f;
                         zPos += sizeCell + gutterGrid;
                     }
