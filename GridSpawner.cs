@@ -370,33 +370,33 @@ public class GridSpawner : EditorWindow
         {
             // Creating arrays for mesh information
             Vector3[] vertices = {
-            // Bottom vertices
-            new Vector3(xPos + sizeCell * 1f, thicknessCell * 0f, zPos + sizeCell * 0f), //0
-            new Vector3(xPos + sizeCell * 0f, thicknessCell * 0f, zPos + sizeCell * 0f), //1
-            new Vector3(xPos + sizeCell * 0.5f, thicknessCell * 0f, zPos + sizeCell * 1f), //2
+                // Bottom vertices
+                new Vector3(xPos + sizeCell * 1f, thicknessCell * 0f, zPos + sizeCell * 0f), //0
+                new Vector3(xPos + sizeCell * 0f, thicknessCell * 0f, zPos + sizeCell * 0f), //1
+                new Vector3(xPos + sizeCell * 0.5f, thicknessCell * 0f, zPos + sizeCell * 1f), //2
 
-            // Right vertices
-            new Vector3(xPos + sizeCell * 0.5f, thicknessCell * 0f, zPos + sizeCell * 1f), //3
-            new Vector3(xPos + sizeCell * 0f, thicknessCell * 0f, zPos + sizeCell * 0f), //4
-            new Vector3(xPos + sizeCell * 0f, thicknessCell * 1f, zPos + sizeCell * 0f), //5
-            new Vector3(xPos + sizeCell * 0.5f, thicknessCell * 1f, zPos + sizeCell * 1f), //6
+                // Right vertices
+                new Vector3(xPos + sizeCell * 0.5f, thicknessCell * 0f, zPos + sizeCell * 1f), //3
+                new Vector3(xPos + sizeCell * 0f, thicknessCell * 0f, zPos + sizeCell * 0f), //4
+                new Vector3(xPos + sizeCell * 0f, thicknessCell * 1f, zPos + sizeCell * 0f), //5
+                new Vector3(xPos + sizeCell * 0.5f, thicknessCell * 1f, zPos + sizeCell * 1f), //6
 
-            // Left vertices
-            new Vector3(xPos + sizeCell * 1f, thicknessCell * 0f, zPos + sizeCell * 0f), //7
-            new Vector3(xPos + sizeCell * 0.5f, thicknessCell * 0f, zPos + sizeCell * 1f), //8
-            new Vector3(xPos + sizeCell * 0.5f, thicknessCell * 1f, zPos + sizeCell * 1f), //9
-            new Vector3(xPos + sizeCell * 1f, thicknessCell * 1f, zPos + sizeCell * 0f), //10
+                // Left vertices
+                new Vector3(xPos + sizeCell * 1f, thicknessCell * 0f, zPos + sizeCell * 0f), //7
+                new Vector3(xPos + sizeCell * 0.5f, thicknessCell * 0f, zPos + sizeCell * 1f), //8
+                new Vector3(xPos + sizeCell * 0.5f, thicknessCell * 1f, zPos + sizeCell * 1f), //9
+                new Vector3(xPos + sizeCell * 1f, thicknessCell * 1f, zPos + sizeCell * 0f), //10
 
-            // Top vertices
-            new Vector3(xPos + sizeCell * 0f, thicknessCell * 1f, zPos + sizeCell * 0f), //11
-            new Vector3(xPos + sizeCell * 1f, thicknessCell * 1f, zPos + sizeCell * 0f), //12
-            new Vector3(xPos + sizeCell * 0.5f, thicknessCell * 1f, zPos + sizeCell * 1f), //13
+                // Top vertices
+                new Vector3(xPos + sizeCell * 0f, thicknessCell * 1f, zPos + sizeCell * 0f), //11
+                new Vector3(xPos + sizeCell * 1f, thicknessCell * 1f, zPos + sizeCell * 0f), //12
+                new Vector3(xPos + sizeCell * 0.5f, thicknessCell * 1f, zPos + sizeCell * 1f), //13
 
-            // Front vertices
-            new Vector3(xPos + sizeCell * 1f, thicknessCell * 1f, zPos + sizeCell * 0f), //14
-            new Vector3(xPos + sizeCell * 0f, thicknessCell * 1f, zPos + sizeCell * 0f), //15
-            new Vector3(xPos + sizeCell * 0f, thicknessCell * 0f, zPos + sizeCell * 0f), //16
-            new Vector3(xPos + sizeCell * 1f, thicknessCell * 0f, zPos + sizeCell * 0f), //17
+                // Front vertices
+                new Vector3(xPos + sizeCell * 1f, thicknessCell * 1f, zPos + sizeCell * 0f), //14
+                new Vector3(xPos + sizeCell * 0f, thicknessCell * 1f, zPos + sizeCell * 0f), //15
+                new Vector3(xPos + sizeCell * 0f, thicknessCell * 0f, zPos + sizeCell * 0f), //16
+                new Vector3(xPos + sizeCell * 1f, thicknessCell * 0f, zPos + sizeCell * 0f), //17
             };
 
             int[] triangles = {
@@ -447,33 +447,33 @@ public class GridSpawner : EditorWindow
         {
             // Creating arrays for mesh information
             Vector3[] vertices = {
-            // Bottom vertices
-            new Vector3(xPos + sizeCell * 0.5f, thicknessCell * 0f, zPos + sizeCell * 0f), //0
-            new Vector3(xPos + sizeCell * 1f, thicknessCell * 0f, zPos + sizeCell * 1f), //1
-            new Vector3(xPos + sizeCell * 0f, thicknessCell * 0f, zPos + sizeCell * 1f), //2
+                // Bottom vertices
+                new Vector3(xPos + sizeCell * 0.5f, thicknessCell * 0f, zPos + sizeCell * 0f), //0
+                new Vector3(xPos + sizeCell * 1f, thicknessCell * 0f, zPos + sizeCell * 1f), //1
+                new Vector3(xPos + sizeCell * 0f, thicknessCell * 0f, zPos + sizeCell * 1f), //2
 
-            // Back vertices
-            new Vector3(xPos + sizeCell * 1f, thicknessCell * 0f, zPos + sizeCell * 1f), //3
-            new Vector3(xPos + sizeCell * 0f, thicknessCell * 0f, zPos + sizeCell * 1f), //4
-            new Vector3(xPos + sizeCell * 1f, thicknessCell * 1f, zPos + sizeCell * 1f), //5
-            new Vector3(xPos + sizeCell * 0f, thicknessCell * 1f, zPos + sizeCell * 1f), //6
+                // Back vertices
+                new Vector3(xPos + sizeCell * 1f, thicknessCell * 0f, zPos + sizeCell * 1f), //3
+                new Vector3(xPos + sizeCell * 0f, thicknessCell * 0f, zPos + sizeCell * 1f), //4
+                new Vector3(xPos + sizeCell * 1f, thicknessCell * 1f, zPos + sizeCell * 1f), //5
+                new Vector3(xPos + sizeCell * 0f, thicknessCell * 1f, zPos + sizeCell * 1f), //6
 
-            // Right vertices
-            new Vector3(xPos + sizeCell * 0f, thicknessCell * 0f, zPos + sizeCell * 1f), //7
-            new Vector3(xPos + sizeCell * 0.5f, thicknessCell * 0f, zPos + sizeCell * 0f), //8
-            new Vector3(xPos + sizeCell * 0.5f, thicknessCell * 1f, zPos + sizeCell * 0f), //9
-            new Vector3(xPos + sizeCell * 0f, thicknessCell * 1f, zPos + sizeCell * 1f), //10
+                // Right vertices
+                new Vector3(xPos + sizeCell * 0f, thicknessCell * 0f, zPos + sizeCell * 1f), //7
+                new Vector3(xPos + sizeCell * 0.5f, thicknessCell * 0f, zPos + sizeCell * 0f), //8
+                new Vector3(xPos + sizeCell * 0.5f, thicknessCell * 1f, zPos + sizeCell * 0f), //9
+                new Vector3(xPos + sizeCell * 0f, thicknessCell * 1f, zPos + sizeCell * 1f), //10
 
-            // Left vertices
-            new Vector3(xPos + sizeCell * 0.5f, thicknessCell * 0f, zPos + sizeCell * 0f), //11
-            new Vector3(xPos + sizeCell * 1f, thicknessCell * 0f, zPos + sizeCell * 1f), //12
-            new Vector3(xPos + sizeCell * 1f, thicknessCell * 1f, zPos + sizeCell * 1f), //13
-            new Vector3(xPos + sizeCell * 0.5f, thicknessCell * 1f, zPos + sizeCell * 0f), //14
+                // Left vertices
+                new Vector3(xPos + sizeCell * 0.5f, thicknessCell * 0f, zPos + sizeCell * 0f), //11
+                new Vector3(xPos + sizeCell * 1f, thicknessCell * 0f, zPos + sizeCell * 1f), //12
+                new Vector3(xPos + sizeCell * 1f, thicknessCell * 1f, zPos + sizeCell * 1f), //13
+                new Vector3(xPos + sizeCell * 0.5f, thicknessCell * 1f, zPos + sizeCell * 0f), //14
 
-            // Top vertices
-            new Vector3(xPos + sizeCell * 0.5f, thicknessCell * 1f, zPos + sizeCell * 0f), //15
-            new Vector3(xPos + sizeCell * 1f, thicknessCell * 1f, zPos + sizeCell * 1f), //16
-            new Vector3(xPos + sizeCell * 0f, thicknessCell * 1f, zPos + sizeCell * 1f), //17
+                // Top vertices
+                new Vector3(xPos + sizeCell * 0.5f, thicknessCell * 1f, zPos + sizeCell * 0f), //15
+                new Vector3(xPos + sizeCell * 1f, thicknessCell * 1f, zPos + sizeCell * 1f), //16
+                new Vector3(xPos + sizeCell * 0f, thicknessCell * 1f, zPos + sizeCell * 1f), //17
             };
 
             int[] triangles = {
