@@ -145,7 +145,31 @@ public class GridSpawner : EditorWindow
                             }
                         }
                         numCell++;
-                        Square(parentCell);
+
+                        //Creating triangle information for mesh
+                        int[] triangles = {
+                            // Bottom triangles
+                            2, 1, 0,
+                            3, 2, 0,
+                            // Back triangles
+                            6, 5, 4,
+                            7, 6, 4,
+                            // Right triangles
+                            10, 9, 8,
+                            11, 10, 8,
+                            // Left triangles
+                            14, 13, 12,
+                            15, 14, 12,
+                            // Top triangles
+                            18, 17, 16,
+                            19, 18, 16,
+                            // Front triangles
+                            22, 21, 20,
+                            23, 22, 20,
+                        };
+
+                        Square(parentCell, triangles);
+
                         xPos += sizeCell + gutterGrid;
                     }
                     xPos = 0f;
@@ -199,7 +223,49 @@ public class GridSpawner : EditorWindow
                             }
                         }
                         numCell++;
-                        Triangle(parentCell);
+
+                        //Creating triangle information for mesh
+                        if (triangleUp)
+                        {
+                            int[] triangles = {
+                                // Bottom triangles
+                                2, 1, 0,
+                                // Right triangles
+                                5, 4, 3,
+                                6, 5, 3,
+                                // Left triangles
+                                9, 8, 7,
+                                10, 9, 7,
+                                // Top triangles
+                                13, 12, 11,
+                                // Front triangles
+                                16, 15, 14,
+                                17, 16, 14,
+                            };
+
+                            Triangle(parentCell, triangles);
+                        }
+                        else
+                        {
+                            int[] triangles = {
+                                // Bottom triangles
+                                2, 1, 0,
+                                // Back triangles
+                                5, 4, 3,
+                                6, 4, 5,
+                                // Right triangles
+                                9, 8, 7,
+                                10, 9, 7,
+                                // Left triangles
+                                13, 12, 11,
+                                14, 13, 11,
+                                // Top triangles
+                                17, 16, 15,
+                            };
+
+                            Triangle(parentCell, triangles);
+                        }
+
                         xPos += sizeCell / 2 + gutterGrid;
                     }
                     if (triangleUp)
@@ -247,7 +313,45 @@ public class GridSpawner : EditorWindow
                             }
                         }
                         numCell++;
-                        Hexagon(parentCell);
+
+                        //Creating triangle information for mesh
+                        int[] triangles = {
+                            // Bottom triangles
+                            1, 0, 6,
+                            2, 1, 6,
+                            3, 2, 6,
+                            4, 3, 6,
+                            5, 4, 6,
+                            0, 5, 6,
+                            // Back right triangles
+                            7, 9, 8,
+                            7, 10, 9,
+                            // Right triangles
+                            11, 13, 12,
+                            11, 14, 13,
+                            // Front right triangles
+                            15, 17, 16,
+                            15, 18, 17,
+                            // Front left triangles
+                            19, 21, 20,
+                            19, 22, 21,
+                            // Left triangles
+                            23, 25, 24,
+                            23, 26, 25,
+                            // Back left triangles
+                            27, 29, 28,
+                            27, 30, 29,
+                            // Top triangles
+                            37, 31, 32,
+                            37, 32, 33,
+                            37, 33, 34,
+                            37, 34, 35,
+                            37, 35, 36,
+                            37, 36, 31,
+                        };
+
+                        Hexagon(parentCell, triangles);
+
                         xPos += sizeCell * (Mathf.Sqrt(3f) / 2f) + gutterGrid;
                     }
                     if (rowEven)
@@ -293,7 +397,7 @@ public class GridSpawner : EditorWindow
     }
 
     // Creates a square mesh with a thickness (also considered a cube)
-    void Square(GameObject parent)
+    void Square(GameObject parent, int[] triangles)
     {
         // Creating arrays for mesh information
         Vector3[] vertices = {
@@ -334,27 +438,6 @@ public class GridSpawner : EditorWindow
             new Vector3(xPos + sizeCell * 1f, thicknessCell * 0f, zPos + sizeCell * 0f), //23
         };
 
-        int[] triangles = {
-            // Bottom triangles
-            2, 1, 0,
-            3, 2, 0,
-            // Back triangles
-            6, 5, 4,
-            7, 6, 4,
-            // Right triangles
-            10, 9, 8,
-            11, 10, 8,
-            // Left triangles
-            14, 13, 12,
-            15, 14, 12,
-            // Top triangles
-            18, 17, 16,
-            19, 18, 16,
-            // Front triangles
-            22, 21, 20,
-            23, 22, 20,
-        };
-
         // Creating mesh
         Mesh cell = new Mesh();
 
@@ -373,7 +456,7 @@ public class GridSpawner : EditorWindow
     }
 
     // Creates a triangle mesh with a thickness
-    void Triangle(GameObject parent)
+    void Triangle(GameObject parent, int[] triangles)
     {
         // Checking which way the triangle is facing
         if (triangleUp)
@@ -407,22 +490,6 @@ public class GridSpawner : EditorWindow
                 new Vector3(xPos + sizeCell * 0f, thicknessCell * 1f, zPos + sizeCell * 0f), //15
                 new Vector3(xPos + sizeCell * 0f, thicknessCell * 0f, zPos + sizeCell * 0f), //16
                 new Vector3(xPos + sizeCell * 1f, thicknessCell * 0f, zPos + sizeCell * 0f), //17
-            };
-
-            int[] triangles = {
-            // Bottom triangles
-            2, 1, 0,
-            // Right triangles
-            5, 4, 3,
-            6, 5, 3,
-            // Left triangles
-            9, 8, 7,
-            10, 9, 7,
-            // Top triangles
-            13, 12, 11,
-            // Front triangles
-            16, 15, 14,
-            17, 16, 14,
             };
 
             // Creating mesh
@@ -476,22 +543,6 @@ public class GridSpawner : EditorWindow
                 new Vector3(xPos + sizeCell * 0f, thicknessCell * 1f, zPos + sizeCell * 1f), //17
             };
 
-            int[] triangles = {
-            // Bottom triangles
-            2, 1, 0,
-            // Back triangles
-            5, 4, 3,
-            6, 4, 5,
-            // Right triangles
-            9, 8, 7,
-            10, 9, 7,
-            // Left triangles
-            13, 12, 11,
-            14, 13, 11,
-            // Top triangles
-            17, 16, 15,
-            };
-
             // Creating mesh
             Mesh cell = new Mesh();
 
@@ -513,7 +564,7 @@ public class GridSpawner : EditorWindow
     }
 
     // Creates a hexagon mesh with a thickness
-    void Hexagon(GameObject parent)
+    void Hexagon(GameObject parent, int[] triangles)
     {
         // Creating arrays for mesh information
         Vector3[] vertices = {
@@ -570,41 +621,6 @@ public class GridSpawner : EditorWindow
         new Vector3(xPos + sizeCell * (0.5f - Mathf.Sqrt(3f) / 4f), thicknessCell * 1f, zPos + sizeCell * 0.25f), //35
         new Vector3(xPos + sizeCell * (0.5f - Mathf.Sqrt(3f) / 4f), thicknessCell * 1f, zPos + sizeCell * 0.75f), //36
         new Vector3(xPos + sizeCell * 0.5f, thicknessCell * 1f, zPos + sizeCell * 0.5f), //37
-        };
-
-        int[] triangles = {
-            // Bottom triangles
-            1, 0, 6,
-            2, 1, 6,
-            3, 2, 6,
-            4, 3, 6,
-            5, 4, 6,
-            0, 5, 6,
-            // Back right triangles
-            7, 9, 8,
-            7, 10, 9,
-            // Right triangles
-            11, 13, 12,
-            11, 14, 13,
-            // Front right triangles
-            15, 17, 16,
-            15, 18, 17,
-            // Front left triangles
-            19, 21, 20,
-            19, 22, 21,
-            // Left triangles
-            23, 25, 24,
-            23, 26, 25,
-            // Back left triangles
-            27, 29, 28,
-            27, 30, 29,
-            // Top triangles
-            37, 31, 32,
-            37, 32, 33,
-            37, 33, 34,
-            37, 34, 35,
-            37, 35, 36,
-            37, 36, 31,
         };
 
         // Creating mesh
