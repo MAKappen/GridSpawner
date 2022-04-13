@@ -59,42 +59,18 @@ public class GridSpawner : EditorWindow
         baseNameCell = EditorGUILayout.TextField("Base Cell Name", baseNameCell);
         matShaderSelected = (MatGrid)EditorGUILayout.EnumPopup("Base Material Shader", matShaderSelected);
         shapeSelected = (ShapeGrid)EditorGUILayout.EnumPopup("Shape Cell ", shapeSelected);
-        sizeCell = EditorGUILayout.FloatField("Size Cell", sizeCell);
-        if (sizeCell < 0)
-        {
-            sizeCell = 0;
-        }
-        heightCell = EditorGUILayout.FloatField("Height Cell", heightCell);
-        if (heightCell < 0)
-        {
-            heightCell = 0;
-        }
-        rowsGrid = EditorGUILayout.IntField("Rows", rowsGrid);
-        if (rowsGrid < 0)
-        {
-            rowsGrid = 0;
-        }
-        columnsGrid = EditorGUILayout.IntField("Colums", columnsGrid);
-        if (columnsGrid < 0)
-        {
-            columnsGrid = 0;
-        }
-        gutterGrid = EditorGUILayout.FloatField("Size Gutter", gutterGrid);
-        if (gutterGrid < 0)
-        {
-            gutterGrid = 0;
-        }
+        sizeCell = Mathf.Max(0, EditorGUILayout.FloatField("Size Cell", sizeCell));
+        heightCell = Mathf.Max(0, EditorGUILayout.FloatField("Height Cell", heightCell));
+        rowsGrid = Mathf.Max(0, EditorGUILayout.IntField("Rows", rowsGrid));
+        columnsGrid = Mathf.Max(0, EditorGUILayout.IntField("Colums", columnsGrid));
+        gutterGrid = Mathf.Max(0, EditorGUILayout.FloatField("Size Gutter", gutterGrid));
 
         EditorGUILayout.Space();
 
         // Creating fields for the prefab settings
         GUILayout.Label("Prefab settings", EditorStyles.boldLabel);
         prefabSource = EditorGUILayout.ObjectField("Prefab", prefabSource, typeof(Object), true);
-        sizePrefab = EditorGUILayout.FloatField("Size", sizePrefab);
-        if (sizePrefab < 0)
-        {
-            sizePrefab = 0;
-        }
+        sizePrefab = Mathf.Max(0, EditorGUILayout.FloatField("Size", sizePrefab));
 
         EditorGUILayout.Space();
 
