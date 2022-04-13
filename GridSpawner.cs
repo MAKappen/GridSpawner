@@ -139,7 +139,7 @@ public class GridSpawner : EditorWindow
                                 numPrefab++;
                                 Vector3 prefabPos = new Vector3(xPos + sizeCell * 0.5f, thicknessCell * 1f, zPos + sizeCell * 0.5f);
                                 GameObject prefabSpawned = (GameObject)Instantiate(prefabSource, prefabPos, Quaternion.identity);
-                                prefabSpawned.name = "Man" + numPrefab;
+                                prefabSpawned.name = "Prefab" + numPrefab;
                                 prefabSpawned.transform.parent = parentPrefab.transform;
                                 prefabSpawned.transform.localScale = new Vector3(sizePrefab, sizePrefab, sizePrefab);
                             }
@@ -179,7 +179,7 @@ public class GridSpawner : EditorWindow
                                     numPrefab++;
                                     Vector3 prefabPos = new Vector3(xPos + sizeCell * 0.5f, thicknessCell * 1f, zPos + sizeCell * 0.33f);
                                     GameObject prefabSpawned = (GameObject)Instantiate(prefabSource, prefabPos, Quaternion.identity);
-                                    prefabSpawned.name = "Man" + numPrefab;
+                                    prefabSpawned.name = "Prefab" + numPrefab;
                                     prefabSpawned.transform.parent = parentPrefab.transform;
                                     prefabSpawned.transform.localScale = new Vector3(sizePrefab, sizePrefab, sizePrefab);
                                 }
@@ -191,7 +191,7 @@ public class GridSpawner : EditorWindow
                                     numPrefab++;
                                     Vector3 prefabPos = new Vector3(xPos + sizeCell * 0.5f, thicknessCell * 1f, zPos + sizeCell * 0.67f);
                                     GameObject prefabSpawned = (GameObject)Instantiate(prefabSource, prefabPos, Quaternion.identity);
-                                    prefabSpawned.name = "Man" + numPrefab;
+                                    prefabSpawned.name = "Prefab" + numPrefab;
                                     prefabSpawned.transform.parent = parentPrefab.transform;
                                     prefabSpawned.transform.localScale = new Vector3(sizePrefab, sizePrefab, sizePrefab);
                                     prefabSpawned.transform.localRotation = Quaternion.Euler(0, 180, 0);
@@ -229,20 +229,9 @@ public class GridSpawner : EditorWindow
             if ((int)shapeSelected == 2)
             {
                 GameObject parentCell = new GameObject("Grid");
+                xPos = -sizeCell * (0.5f - Mathf.Sqrt(3f) / 4f);
                 for (int j = 0; j < rowsGrid; j++)
                 {
-                    if (rowEven)
-                    {
-                        xPos = 0f;
-                        zPos += sizeCell - 0.5f + gutterGrid;
-                        rowEven = false;
-                    }
-                    else
-                    {
-                        xPos = gutterGrid / 2 + sizeCell / 2;
-                        zPos += sizeCell - 0.5f + gutterGrid;
-                        rowEven = true;
-                    }
                     for (int i = 0; i < columnsGrid; i++)
                     {
                         if (sizePrefab != 0)
@@ -252,14 +241,26 @@ public class GridSpawner : EditorWindow
                                 numPrefab++;
                                 Vector3 prefabPos = new Vector3(xPos + sizeCell * 0.5f, thicknessCell * 1f, zPos + sizeCell * 0.5f);
                                 GameObject prefabSpawned = (GameObject)Instantiate(prefabSource, prefabPos, Quaternion.identity);
-                                prefabSpawned.name = "Man" + numPrefab;
+                                prefabSpawned.name = "Prefab" + numPrefab;
                                 prefabSpawned.transform.parent = parentPrefab.transform;
                                 prefabSpawned.transform.localScale = new Vector3(sizePrefab, sizePrefab, sizePrefab);
                             }
                         }
                         numCell++;
                         Hexagon(parentCell);
-                        xPos += sizeCell + gutterGrid;
+                        xPos += sizeCell * (Mathf.Sqrt(3f) / 2f) + gutterGrid;
+                    }
+                    if (rowEven)
+                    {
+                        xPos = -sizeCell * (0.5f - Mathf.Sqrt(3f) / 4f);
+                        zPos += sizeCell * 0.75f + gutterGrid;
+                        rowEven = false;
+                    }
+                    else
+                    {
+                        xPos = sizeCell * (Mathf.Sqrt(3f) / 4f) - sizeCell * (0.5f - Mathf.Sqrt(3f) / 4f) + gutterGrid / 2;
+                        zPos += sizeCell * 0.75f + gutterGrid;
+                        rowEven = true;
                     }
                 }
                 xPos = 0f;
@@ -533,56 +534,56 @@ public class GridSpawner : EditorWindow
         Vector3[] vertices = {
         // Bottom vertices
         new Vector3(xPos + sizeCell * 0.5f, thicknessCell * 0f, zPos + sizeCell * 1f), //0
-        new Vector3(xPos + sizeCell * 1f, thicknessCell * 0f, zPos + sizeCell * 0.75f), //1
-        new Vector3(xPos + sizeCell * 1f, thicknessCell * 0f, zPos + sizeCell * 0.25f), //2
+        new Vector3(xPos + sizeCell * (0.5f + Mathf.Sqrt(3f) / 4f), thicknessCell * 0f, zPos + sizeCell * 0.75f), //1
+        new Vector3(xPos + sizeCell * (0.5f + Mathf.Sqrt(3f) / 4f), thicknessCell * 0f, zPos + sizeCell * 0.25f), //2
         new Vector3(xPos + sizeCell * 0.5f, thicknessCell * 0f, zPos + sizeCell * 0f), //3
-        new Vector3(xPos + sizeCell * 0f, thicknessCell * 0f, zPos + sizeCell * 0.25f), //4
-        new Vector3(xPos + sizeCell * 0f, thicknessCell * 0f, zPos + sizeCell * 0.75f), //5
+        new Vector3(xPos + sizeCell * (0.5f - Mathf.Sqrt(3f) / 4f), thicknessCell * 0f, zPos + sizeCell * 0.25f), //4
+        new Vector3(xPos + sizeCell * (0.5f - Mathf.Sqrt(3f) / 4f), thicknessCell * 0f, zPos + sizeCell * 0.75f), //5
         new Vector3(xPos + sizeCell * 0.5f, thicknessCell * 0f, zPos + sizeCell * 0.5f), //6
         
         // Back right vertices
         new Vector3(xPos + sizeCell * 0.5f, thicknessCell * 0f, zPos + sizeCell * 1f), //7
-        new Vector3(xPos + sizeCell * 0f, thicknessCell * 0f, zPos + sizeCell * 0.75f), //8
-        new Vector3(xPos + sizeCell * 0f, thicknessCell * 1f, zPos + sizeCell * 0.75f), //9
+        new Vector3(xPos + sizeCell * (0.5f - Mathf.Sqrt(3f) / 4f), thicknessCell * 0f, zPos + sizeCell * 0.75f), //8
+        new Vector3(xPos + sizeCell * (0.5f - Mathf.Sqrt(3f) / 4f), thicknessCell * 1f, zPos + sizeCell * 0.75f), //9
         new Vector3(xPos + sizeCell * 0.5f, thicknessCell * 1f, zPos + sizeCell * 1f), //10
 
         // Right vertices
-        new Vector3(xPos + sizeCell * 0f, thicknessCell * 0f, zPos + sizeCell * 0.75f), //11
-        new Vector3(xPos + sizeCell * 0f, thicknessCell * 0f, zPos + sizeCell * 0.25f), //12
-        new Vector3(xPos + sizeCell * 0f, thicknessCell * 1f, zPos + sizeCell * 0.25f), //13
-        new Vector3(xPos + sizeCell * 0f, thicknessCell * 1f, zPos + sizeCell * 0.75f), //14
+        new Vector3(xPos + sizeCell * (0.5f - Mathf.Sqrt(3f) / 4f), thicknessCell * 0f, zPos + sizeCell * 0.75f), //11
+        new Vector3(xPos + sizeCell * (0.5f - Mathf.Sqrt(3f) / 4f), thicknessCell * 0f, zPos + sizeCell * 0.25f), //12
+        new Vector3(xPos + sizeCell * (0.5f - Mathf.Sqrt(3f) / 4f), thicknessCell * 1f, zPos + sizeCell * 0.25f), //13
+        new Vector3(xPos + sizeCell * (0.5f - Mathf.Sqrt(3f) / 4f), thicknessCell * 1f, zPos + sizeCell * 0.75f), //14
 
         // Front right vertices
-        new Vector3(xPos + sizeCell * 0f, thicknessCell * 0f, zPos + sizeCell * 0.25f), //15
+        new Vector3(xPos + sizeCell * (0.5f - Mathf.Sqrt(3f) / 4f), thicknessCell * 0f, zPos + sizeCell * 0.25f), //15
         new Vector3(xPos + sizeCell * 0.5f, thicknessCell * 0f, zPos + sizeCell * 0f), //16
         new Vector3(xPos + sizeCell * 0.5f, thicknessCell * 1f, zPos + sizeCell * 0f), //17
-        new Vector3(xPos + sizeCell * 0f, thicknessCell * 1f, zPos + sizeCell * 0.25f), //18
+        new Vector3(xPos + sizeCell * (0.5f - Mathf.Sqrt(3f) / 4f), thicknessCell * 1f, zPos + sizeCell * 0.25f), //18
 
         // Front left vertices
         new Vector3(xPos + sizeCell * 0.5f, thicknessCell * 0f, zPos + sizeCell * 0f), //19
-        new Vector3(xPos + sizeCell * 1f, thicknessCell * 0f, zPos + sizeCell * 0.25f), //20
-        new Vector3(xPos + sizeCell * 1f, thicknessCell * 1f, zPos + sizeCell * 0.25f), //21
+        new Vector3(xPos + sizeCell * (0.5f + Mathf.Sqrt(3f) / 4f), thicknessCell * 0f, zPos + sizeCell * 0.25f), //20
+        new Vector3(xPos + sizeCell * (0.5f + Mathf.Sqrt(3f) / 4f), thicknessCell * 1f, zPos + sizeCell * 0.25f), //21
         new Vector3(xPos + sizeCell * 0.5f, thicknessCell * 1f, zPos + sizeCell * 0f), //22
 
         // Left vertices
-        new Vector3(xPos + sizeCell * 1f, thicknessCell * 0f, zPos + sizeCell * 0.25f), //23
-        new Vector3(xPos + sizeCell * 1f, thicknessCell * 0f, zPos + sizeCell * 0.75f), //24
-        new Vector3(xPos + sizeCell * 1f, thicknessCell * 1f, zPos + sizeCell * 0.75f), //25
-        new Vector3(xPos + sizeCell * 1f, thicknessCell * 1f, zPos + sizeCell * 0.25f), //26
+        new Vector3(xPos + sizeCell * (0.5f + Mathf.Sqrt(3f) / 4f), thicknessCell * 0f, zPos + sizeCell * 0.25f), //23
+        new Vector3(xPos + sizeCell * (0.5f + Mathf.Sqrt(3f) / 4f), thicknessCell * 0f, zPos + sizeCell * 0.75f), //24
+        new Vector3(xPos + sizeCell * (0.5f + Mathf.Sqrt(3f) / 4f), thicknessCell * 1f, zPos + sizeCell * 0.75f), //25
+        new Vector3(xPos + sizeCell * (0.5f + Mathf.Sqrt(3f) / 4f), thicknessCell * 1f, zPos + sizeCell * 0.25f), //26
 
         // Back left vertices
-        new Vector3(xPos + sizeCell * 1f, thicknessCell * 0f, zPos + sizeCell * 0.75f), //27
+        new Vector3(xPos + sizeCell * (0.5f + Mathf.Sqrt(3f) / 4f), thicknessCell * 0f, zPos + sizeCell * 0.75f), //27
         new Vector3(xPos + sizeCell * 0.5f, thicknessCell * 0f, zPos + sizeCell * 1f), //28
         new Vector3(xPos + sizeCell * 0.5f, thicknessCell * 1f, zPos + sizeCell * 1f), //29
-        new Vector3(xPos + sizeCell * 1f, thicknessCell * 1f, zPos + sizeCell * 0.75f), //30
+        new Vector3(xPos + sizeCell * (0.5f + Mathf.Sqrt(3f) / 4f), thicknessCell * 1f, zPos + sizeCell * 0.75f), //30
 
         // Bottom vertices
         new Vector3(xPos + sizeCell * 0.5f, thicknessCell * 1f, zPos + sizeCell * 1f), //31
-        new Vector3(xPos + sizeCell * 1f, thicknessCell * 1f, zPos + sizeCell * 0.75f), //32
-        new Vector3(xPos + sizeCell * 1f, thicknessCell * 1f, zPos + sizeCell * 0.25f), //33
+        new Vector3(xPos + sizeCell * (0.5f + Mathf.Sqrt(3f) / 4f), thicknessCell * 1f, zPos + sizeCell * 0.75f), //32
+        new Vector3(xPos + sizeCell * (0.5f + Mathf.Sqrt(3f) / 4f), thicknessCell * 1f, zPos + sizeCell * 0.25f), //33
         new Vector3(xPos + sizeCell * 0.5f, thicknessCell * 1f, zPos + sizeCell * 0f), //34
-        new Vector3(xPos + sizeCell * 0f, thicknessCell * 1f, zPos + sizeCell * 0.25f), //35
-        new Vector3(xPos + sizeCell * 0f, thicknessCell * 1f, zPos + sizeCell * 0.75f), //36
+        new Vector3(xPos + sizeCell * (0.5f - Mathf.Sqrt(3f) / 4f), thicknessCell * 1f, zPos + sizeCell * 0.25f), //35
+        new Vector3(xPos + sizeCell * (0.5f - Mathf.Sqrt(3f) / 4f), thicknessCell * 1f, zPos + sizeCell * 0.75f), //36
         new Vector3(xPos + sizeCell * 0.5f, thicknessCell * 1f, zPos + sizeCell * 0.5f), //37
         };
 
