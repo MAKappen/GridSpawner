@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
-public enum shapeGrid
+public enum ShapeGrid
 {
     Square,
     Triangle,
     Hexagon,
 }
 
-public enum matGrid
+public enum MatGrid
 {
     Standard,
     HDRP,
@@ -19,8 +19,8 @@ public enum matGrid
 public class GridSpawner : EditorWindow
 {
     string baseNameCell;
-    public matGrid matShaderSelected;
-    public shapeGrid shapeSelected;
+    public MatGrid matShaderSelected;
+    public ShapeGrid shapeSelected;
     float sizeCell;
     float heightCell;
     int rowsGrid;
@@ -57,8 +57,8 @@ public class GridSpawner : EditorWindow
         // Creating fields for the grid settings
         GUILayout.Label("Grid Settings", EditorStyles.boldLabel);
         baseNameCell = EditorGUILayout.TextField("Base Cell Name", baseNameCell);
-        matShaderSelected = (matGrid)EditorGUILayout.EnumPopup("Base Material Shader", matShaderSelected);
-        shapeSelected = (shapeGrid)EditorGUILayout.EnumPopup("Shape Cell ", shapeSelected);
+        matShaderSelected = (MatGrid)EditorGUILayout.EnumPopup("Base Material Shader", matShaderSelected);
+        shapeSelected = (ShapeGrid)EditorGUILayout.EnumPopup("Shape Cell ", shapeSelected);
         sizeCell = EditorGUILayout.FloatField("Size Cell", sizeCell);
         if (sizeCell < 0)
         {
@@ -110,12 +110,9 @@ public class GridSpawner : EditorWindow
             cellPrefab = new bool[columnsGrid * rowsGrid];
 
             GameObject parentPrefab = null;
-            if (prefabSource != null)
+            if (prefabSource != null && sizePrefab != 0)
             {
-                if (sizePrefab != 0)
-                {
-                    parentPrefab = new GameObject("Prefabs");
-                }
+                parentPrefab = new GameObject("Prefabs");
             }
 
             // Calculates the amount of cells that need to have a prefab present
@@ -129,22 +126,19 @@ public class GridSpawner : EditorWindow
             switch (shapeSelected)
             {
                 // Square selected
-                case shapeGrid.Square:
+                case ShapeGrid.Square:
                     for (int row = 0; row < rowsGrid; row++)
                     {
                         for (int column = 0; column < columnsGrid; column++)
                         {
-                            if (sizePrefab != 0)
+                            if (sizePrefab != 0 && cellPrefab[numCell])
                             {
-                                if (cellPrefab[numCell])
-                                {
-                                    numPrefab++;
-                                    Vector3 prefabPos = new Vector3(xPos + sizeCell * 0.5f, heightCell * 1f, zPos + sizeCell * 0.5f);
-                                    GameObject prefabSpawned = (GameObject)Instantiate(prefabSource, prefabPos, Quaternion.identity);
-                                    prefabSpawned.name = "Prefab" + numPrefab;
-                                    prefabSpawned.transform.parent = parentPrefab.transform;
-                                    prefabSpawned.transform.localScale = new Vector3(sizePrefab, sizePrefab, sizePrefab);
-                                }
+                                numPrefab++;
+                                Vector3 prefabPos = new Vector3(xPos + sizeCell * 0.5f, heightCell * 1f, zPos + sizeCell * 0.5f);
+                                GameObject prefabSpawned = (GameObject)Instantiate(prefabSource, prefabPos, Quaternion.identity);
+                                prefabSpawned.name = "Prefab" + numPrefab;
+                                prefabSpawned.transform.parent = parentPrefab.transform;
+                                prefabSpawned.transform.localScale = new Vector3(sizePrefab, sizePrefab, sizePrefab);
                             }
                             numCell++;
 
@@ -190,37 +184,31 @@ public class GridSpawner : EditorWindow
                     break;
 
                 // Triangle selected
-                case shapeGrid.Triangle:
+                case ShapeGrid.Triangle:
                     for (int row = 0; row < rowsGrid; row++)
                     {
                         for (int column = 0; column < columnsGrid; column++)
                         {
-                            if (sizePrefab != 0)
+                            if (sizePrefab != 0 && cellPrefab[numCell])
                             {
                                 if (triangleUp)
                                 {
-                                    if (cellPrefab[numCell])
-                                    {
-                                        numPrefab++;
-                                        Vector3 prefabPos = new Vector3(xPos + sizeCell * 0.5f, heightCell * 1f, zPos + sizeCell * 0.33f);
-                                        GameObject prefabSpawned = (GameObject)Instantiate(prefabSource, prefabPos, Quaternion.identity);
-                                        prefabSpawned.name = "Prefab" + numPrefab;
-                                        prefabSpawned.transform.parent = parentPrefab.transform;
-                                        prefabSpawned.transform.localScale = new Vector3(sizePrefab, sizePrefab, sizePrefab);
-                                    }
+                                    numPrefab++;
+                                    Vector3 prefabPos = new Vector3(xPos + sizeCell * 0.5f, heightCell * 1f, zPos + sizeCell * 0.33f);
+                                    GameObject prefabSpawned = (GameObject)Instantiate(prefabSource, prefabPos, Quaternion.identity);
+                                    prefabSpawned.name = "Prefab" + numPrefab;
+                                    prefabSpawned.transform.parent = parentPrefab.transform;
+                                    prefabSpawned.transform.localScale = new Vector3(sizePrefab, sizePrefab, sizePrefab);
                                 }
                                 else
                                 {
-                                    if (cellPrefab[numCell])
-                                    {
-                                        numPrefab++;
-                                        Vector3 prefabPos = new Vector3(xPos + sizeCell * 0.5f, heightCell * 1f, zPos + sizeCell * 0.67f);
-                                        GameObject prefabSpawned = (GameObject)Instantiate(prefabSource, prefabPos, Quaternion.identity);
-                                        prefabSpawned.name = "Prefab" + numPrefab;
-                                        prefabSpawned.transform.parent = parentPrefab.transform;
-                                        prefabSpawned.transform.localScale = new Vector3(sizePrefab, sizePrefab, sizePrefab);
-                                        prefabSpawned.transform.localRotation = Quaternion.Euler(0, 180, 0);
-                                    }
+                                    numPrefab++;
+                                    Vector3 prefabPos = new Vector3(xPos + sizeCell * 0.5f, heightCell * 1f, zPos + sizeCell * 0.67f);
+                                    GameObject prefabSpawned = (GameObject)Instantiate(prefabSource, prefabPos, Quaternion.identity);
+                                    prefabSpawned.name = "Prefab" + numPrefab;
+                                    prefabSpawned.transform.parent = parentPrefab.transform;
+                                    prefabSpawned.transform.localScale = new Vector3(sizePrefab, sizePrefab, sizePrefab);
+                                    prefabSpawned.transform.localRotation = Quaternion.Euler(0, 180, 0);
                                 }
                             }
                             numCell++;
@@ -287,23 +275,20 @@ public class GridSpawner : EditorWindow
                     break;
 
                 // Hexagon selected
-                case shapeGrid.Hexagon:
+                case ShapeGrid.Hexagon:
                     xPos = -sizeCell * (0.5f - Mathf.Sqrt(3f) / 4f);
                     for (int row = 0; row < rowsGrid; row++)
                     {
                         for (int column = 0; column < columnsGrid; column++)
                         {
-                            if (sizePrefab != 0)
+                            if (sizePrefab != 0 && cellPrefab[numCell])
                             {
-                                if (cellPrefab[numCell])
-                                {
-                                    numPrefab++;
-                                    Vector3 prefabPos = new Vector3(xPos + sizeCell * 0.5f, heightCell * 1f, zPos + sizeCell * 0.5f);
-                                    GameObject prefabSpawned = (GameObject)Instantiate(prefabSource, prefabPos, Quaternion.identity);
-                                    prefabSpawned.name = "Prefab" + numPrefab;
-                                    prefabSpawned.transform.parent = parentPrefab.transform;
-                                    prefabSpawned.transform.localScale = new Vector3(sizePrefab, sizePrefab, sizePrefab);
-                                }
+                                numPrefab++;
+                                Vector3 prefabPos = new Vector3(xPos + sizeCell * 0.5f, heightCell * 1f, zPos + sizeCell * 0.5f);
+                                GameObject prefabSpawned = (GameObject)Instantiate(prefabSource, prefabPos, Quaternion.identity);
+                                prefabSpawned.name = "Prefab" + numPrefab;
+                                prefabSpawned.transform.parent = parentPrefab.transform;
+                                prefabSpawned.transform.localScale = new Vector3(sizePrefab, sizePrefab, sizePrefab);
                             }
                             numCell++;
 
@@ -380,11 +365,11 @@ public class GridSpawner : EditorWindow
         // Checks which shader is selected, and then creates a material
         switch (matShaderSelected)
         {
-            case matGrid.Standard:
+            case MatGrid.Standard:
                 cellObject.GetComponent<MeshRenderer>().material = new Material(Shader.Find("Standard"));
                 break;
 
-            case matGrid.HDRP:
+            case MatGrid.HDRP:
                 cellObject.GetComponent<MeshRenderer>().material = new Material(Shader.Find("HDRP/Lit"));
                 break;
         }
