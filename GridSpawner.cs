@@ -277,6 +277,21 @@ public class GridSpawner : EditorWindow
         }
     }
 
+    void CreateMaterial(GameObject parent, GameObject cellObject)
+    {
+        // Checks which shader is selected, and then creates a material
+        if ((int)matShaderSelected == 0)
+        {
+            cellObject.GetComponent<MeshRenderer>().material = new Material(Shader.Find("Standard"));
+        }
+        if ((int)matShaderSelected == 1)
+        {
+            cellObject.GetComponent<MeshRenderer>().material = new Material(Shader.Find("HDRP/Lit"));
+        }
+
+        cellObject.transform.parent = parent.transform;
+    }
+
     // Creates a square mesh with a thickness (also considered a cube)
     void Square(GameObject parent)
     {
@@ -354,17 +369,7 @@ public class GridSpawner : EditorWindow
 
         cellObject.GetComponent<MeshFilter>().mesh = cell;
 
-        // Checks which shader is selected, and then creates a material
-        if ((int)matShaderSelected == 0)
-        {
-            cellObject.GetComponent<MeshRenderer>().material = new Material(Shader.Find("Standard"));
-        }
-        if ((int)matShaderSelected == 1)
-        {
-            cellObject.GetComponent<MeshRenderer>().material = new Material(Shader.Find("HDRP/Lit"));
-        }
-
-        cellObject.transform.parent = parent.transform;
+        CreateMaterial(parent, cellObject);
     }
 
     // Creates a triangle mesh with a thickness
@@ -434,17 +439,7 @@ public class GridSpawner : EditorWindow
 
             cellObject.GetComponent<MeshFilter>().mesh = cell;
 
-            // Checks which shader is selected, and then creates a material
-            if ((int)matShaderSelected == 0)
-            {
-                cellObject.GetComponent<MeshRenderer>().material = new Material(Shader.Find("Standard"));
-            }
-            if ((int)matShaderSelected == 1)
-            {
-                cellObject.GetComponent<MeshRenderer>().material = new Material(Shader.Find("HDRP/Lit"));
-            }
-
-            cellObject.transform.parent = parent.transform;
+            CreateMaterial(parent, cellObject);
 
             triangleUp = false;
         }
@@ -511,17 +506,7 @@ public class GridSpawner : EditorWindow
 
             cellObject.GetComponent<MeshFilter>().mesh = cell;
 
-            // Checks which shader is selected, and then creates a material
-            if ((int)matShaderSelected == 0)
-            {
-                cellObject.GetComponent<MeshRenderer>().material = new Material(Shader.Find("Standard"));
-            }
-            if ((int)matShaderSelected == 1)
-            {
-                cellObject.GetComponent<MeshRenderer>().material = new Material(Shader.Find("HDRP/Lit"));
-            }
-
-            cellObject.transform.parent = parent.transform;
+            CreateMaterial(parent, cellObject);
 
             triangleUp = true;
         }
@@ -636,15 +621,7 @@ public class GridSpawner : EditorWindow
 
         cellObject.GetComponent<MeshFilter>().mesh = cell;
 
-        // Checks which shader is selected, and then creates a material
-        if ((int)matShaderSelected == 0)
-        {
-            cellObject.GetComponent<MeshRenderer>().material = new Material(Shader.Find("Standard"));
-        }
-        if ((int)matShaderSelected == 1)
-        {
-            cellObject.GetComponent<MeshRenderer>().material = new Material(Shader.Find("HDRP/Lit"));
-        }
+        CreateMaterial(parent, cellObject);
 
         cellObject.transform.parent = parent.transform;
     }
