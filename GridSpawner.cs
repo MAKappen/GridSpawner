@@ -5,9 +5,9 @@ using UnityEditor;
 
 public enum shapeGrid
 {
-    Square = 0,
-    Triangle = 1,
-    Hexagon = 2,
+    Square,
+    Triangle,
+    Hexagon,
 }
 
 public enum matGrid
@@ -22,7 +22,7 @@ public class GridSpawner : EditorWindow
     public matGrid matShaderSelected;
     public shapeGrid shapeSelected;
     float sizeCell;
-    float thicknessCell;
+    float heightCell;
     int rowsGrid;
     int columnsGrid;
     float gutterGrid;
@@ -64,10 +64,10 @@ public class GridSpawner : EditorWindow
         {
             sizeCell = 0;
         }
-        thicknessCell = EditorGUILayout.FloatField("Thickness Cell", thicknessCell);
-        if (thicknessCell < 0)
+        heightCell = EditorGUILayout.FloatField("Height Cell", heightCell);
+        if (heightCell < 0)
         {
-            thicknessCell = 0;
+            heightCell = 0;
         }
         rowsGrid = EditorGUILayout.IntField("Rows", rowsGrid);
         if (rowsGrid < 0)
@@ -123,260 +123,261 @@ public class GridSpawner : EditorWindow
 
             RandomPick();
 
+            GameObject parentCell = new GameObject("Grid");
+
             // Checks which base shape has been selected, and creates a grid
-            // Square selected
-            if ((int)shapeSelected == 0)
+            switch (shapeSelected)
             {
-                GameObject parentCell = new GameObject("Grid");
-                for (int j = 0; j < rowsGrid; j++)
-                {
-                    for (int i = 0; i < columnsGrid; i++)
+                // Square selected
+                case shapeGrid.Square:
+                    for (int j = 0; j < rowsGrid; j++)
                     {
-                        if (sizePrefab != 0)
+                        for (int i = 0; i < columnsGrid; i++)
                         {
-                            if (cellPrefab[numCell])
-                            {
-                                numPrefab++;
-                                Vector3 prefabPos = new Vector3(xPos + sizeCell * 0.5f, thicknessCell * 1f, zPos + sizeCell * 0.5f);
-                                GameObject prefabSpawned = (GameObject)Instantiate(prefabSource, prefabPos, Quaternion.identity);
-                                prefabSpawned.name = "Prefab" + numPrefab;
-                                prefabSpawned.transform.parent = parentPrefab.transform;
-                                prefabSpawned.transform.localScale = new Vector3(sizePrefab, sizePrefab, sizePrefab);
-                            }
-                        }
-                        numCell++;
-
-                        //Creating triangle information for mesh
-                        int[] triangles = {
-                            // Bottom triangles
-                            2, 1, 0,
-                            3, 2, 0,
-                            // Back triangles
-                            6, 5, 4,
-                            7, 6, 4,
-                            // Right triangles
-                            10, 9, 8,
-                            11, 10, 8,
-                            // Left triangles
-                            14, 13, 12,
-                            15, 14, 12,
-                            // Top triangles
-                            18, 17, 16,
-                            19, 18, 16,
-                            // Front triangles
-                            22, 21, 20,
-                            23, 22, 20,
-                        };
-
-                        Square(parentCell, triangles);
-
-                        xPos += sizeCell + gutterGrid;
-                    }
-                    xPos = 0f;
-                    zPos += sizeCell + gutterGrid;
-                }
-                xPos = 0f;
-                zPos = 0f;
-                numCell = 0;
-                numPrefab = 0;
-                cellAmount = 0;
-                currentRandomCell = 0;
-                for (int i = 0; i < cellAmount; i++)
-                {
-                    cellPrefab[i] = false;
-                }
-            }
-            // Triangle selected
-            if ((int)shapeSelected == 1)
-            {
-                GameObject parentCell = new GameObject("Grid");
-                for (int j = 0; j < rowsGrid; j++)
-                {
-                    for (int i = 0; i < columnsGrid; i++)
-                    {
-                        if (sizePrefab != 0)
-                        {
-                            if (triangleUp)
+                            if (sizePrefab != 0)
                             {
                                 if (cellPrefab[numCell])
                                 {
                                     numPrefab++;
-                                    Vector3 prefabPos = new Vector3(xPos + sizeCell * 0.5f, thicknessCell * 1f, zPos + sizeCell * 0.33f);
+                                    Vector3 prefabPos = new Vector3(xPos + sizeCell * 0.5f, heightCell * 1f, zPos + sizeCell * 0.5f);
                                     GameObject prefabSpawned = (GameObject)Instantiate(prefabSource, prefabPos, Quaternion.identity);
                                     prefabSpawned.name = "Prefab" + numPrefab;
                                     prefabSpawned.transform.parent = parentPrefab.transform;
                                     prefabSpawned.transform.localScale = new Vector3(sizePrefab, sizePrefab, sizePrefab);
                                 }
+                            }
+                            numCell++;
+
+                            //Creating triangle information for mesh
+                            int[] triangles = {
+                                    // Bottom triangles
+                                    2, 1, 0,
+                                    3, 2, 0,
+                                    // Back triangles
+                                    6, 5, 4,
+                                    7, 6, 4,
+                                    // Right triangles
+                                    10, 9, 8,
+                                    11, 10, 8,
+                                    // Left triangles
+                                    14, 13, 12,
+                                    15, 14, 12,
+                                    // Top triangles
+                                    18, 17, 16,
+                                    19, 18, 16,
+                                    // Front triangles
+                                    22, 21, 20,
+                                    23, 22, 20,
+                                };
+
+                            Square(parentCell, triangles);
+
+                            xPos += sizeCell + gutterGrid;
+                        }
+                        xPos = 0f;
+                        zPos += sizeCell + gutterGrid;
+                    }
+                    xPos = 0f;
+                    zPos = 0f;
+                    numCell = 0;
+                    numPrefab = 0;
+                    cellAmount = 0;
+                    currentRandomCell = 0;
+                    for (int i = 0; i < cellAmount; i++)
+                    {
+                        cellPrefab[i] = false;
+                    }
+                    break;
+
+                // Triangle selected
+                case shapeGrid.Triangle:
+                    for (int j = 0; j < rowsGrid; j++)
+                    {
+                        for (int i = 0; i < columnsGrid; i++)
+                        {
+                            if (sizePrefab != 0)
+                            {
+                                if (triangleUp)
+                                {
+                                    if (cellPrefab[numCell])
+                                    {
+                                        numPrefab++;
+                                        Vector3 prefabPos = new Vector3(xPos + sizeCell * 0.5f, heightCell * 1f, zPos + sizeCell * 0.33f);
+                                        GameObject prefabSpawned = (GameObject)Instantiate(prefabSource, prefabPos, Quaternion.identity);
+                                        prefabSpawned.name = "Prefab" + numPrefab;
+                                        prefabSpawned.transform.parent = parentPrefab.transform;
+                                        prefabSpawned.transform.localScale = new Vector3(sizePrefab, sizePrefab, sizePrefab);
+                                    }
+                                }
+                                else
+                                {
+                                    if (cellPrefab[numCell])
+                                    {
+                                        numPrefab++;
+                                        Vector3 prefabPos = new Vector3(xPos + sizeCell * 0.5f, heightCell * 1f, zPos + sizeCell * 0.67f);
+                                        GameObject prefabSpawned = (GameObject)Instantiate(prefabSource, prefabPos, Quaternion.identity);
+                                        prefabSpawned.name = "Prefab" + numPrefab;
+                                        prefabSpawned.transform.parent = parentPrefab.transform;
+                                        prefabSpawned.transform.localScale = new Vector3(sizePrefab, sizePrefab, sizePrefab);
+                                        prefabSpawned.transform.localRotation = Quaternion.Euler(0, 180, 0);
+                                    }
+                                }
+                            }
+                            numCell++;
+
+                            //Creating triangle information for mesh
+                            if (triangleUp)
+                            {
+                                int[] triangles = {
+                                        // Bottom triangles
+                                        2, 1, 0,
+                                        // Right triangles
+                                        5, 4, 3,
+                                        6, 5, 3,
+                                        // Left triangles
+                                        9, 8, 7,
+                                        10, 9, 7,
+                                        // Top triangles
+                                        13, 12, 11,
+                                        // Front triangles
+                                        16, 15, 14,
+                                        17, 16, 14,
+                                    };
+
+                                Triangle(parentCell, triangles);
                             }
                             else
                             {
+                                int[] triangles = {
+                                        // Bottom triangles
+                                        2, 1, 0,
+                                        // Back triangles
+                                        5, 4, 3,
+                                        6, 4, 5,
+                                        // Right triangles
+                                        9, 8, 7,
+                                        10, 9, 7,
+                                        // Left triangles
+                                        13, 12, 11,
+                                        14, 13, 11,
+                                        // Top triangles
+                                        17, 16, 15,
+                                    };
+
+                                Triangle(parentCell, triangles);
+                            }
+
+                            xPos += sizeCell / 2 + gutterGrid;
+                        }
+                        if (triangleUp)
+                        {
+                            triangleUp = false;
+                        }
+                        else
+                        {
+                            triangleUp = true;
+                        }
+                        xPos = 0f;
+                        zPos += sizeCell + gutterGrid;
+                    }
+                    xPos = 0f;
+                    zPos = 0f;
+                    numCell = 0;
+                    numPrefab = 0;
+                    cellAmount = 0;
+                    currentRandomCell = 0;
+                    for (int i = 0; i < cellAmount; i++)
+                    {
+                        cellPrefab[i] = false;
+                    }
+                    triangleUp = true;
+                    break;
+
+                // Hexagon selected
+                case shapeGrid.Hexagon:
+                    xPos = -sizeCell * (0.5f - Mathf.Sqrt(3f) / 4f);
+                    for (int j = 0; j < rowsGrid; j++)
+                    {
+                        for (int i = 0; i < columnsGrid; i++)
+                        {
+                            if (sizePrefab != 0)
+                            {
                                 if (cellPrefab[numCell])
                                 {
                                     numPrefab++;
-                                    Vector3 prefabPos = new Vector3(xPos + sizeCell * 0.5f, thicknessCell * 1f, zPos + sizeCell * 0.67f);
+                                    Vector3 prefabPos = new Vector3(xPos + sizeCell * 0.5f, heightCell * 1f, zPos + sizeCell * 0.5f);
                                     GameObject prefabSpawned = (GameObject)Instantiate(prefabSource, prefabPos, Quaternion.identity);
                                     prefabSpawned.name = "Prefab" + numPrefab;
                                     prefabSpawned.transform.parent = parentPrefab.transform;
                                     prefabSpawned.transform.localScale = new Vector3(sizePrefab, sizePrefab, sizePrefab);
-                                    prefabSpawned.transform.localRotation = Quaternion.Euler(0, 180, 0);
                                 }
                             }
-                        }
-                        numCell++;
+                            numCell++;
 
-                        //Creating triangle information for mesh
-                        if (triangleUp)
-                        {
+                            //Creating triangle information for mesh
                             int[] triangles = {
-                                // Bottom triangles
-                                2, 1, 0,
-                                // Right triangles
-                                5, 4, 3,
-                                6, 5, 3,
-                                // Left triangles
-                                9, 8, 7,
-                                10, 9, 7,
-                                // Top triangles
-                                13, 12, 11,
-                                // Front triangles
-                                16, 15, 14,
-                                17, 16, 14,
-                            };
+                                    // Bottom triangles
+                                    1, 0, 6,
+                                    2, 1, 6,
+                                    3, 2, 6,
+                                    4, 3, 6,
+                                    5, 4, 6,
+                                    0, 5, 6,
+                                    // Back right triangles
+                                    7, 9, 8,
+                                    7, 10, 9,
+                                    // Right triangles
+                                    11, 13, 12,
+                                    11, 14, 13,
+                                    // Front right triangles
+                                    15, 17, 16,
+                                    15, 18, 17,
+                                    // Front left triangles
+                                    19, 21, 20,
+                                    19, 22, 21,
+                                    // Left triangles
+                                    23, 25, 24,
+                                    23, 26, 25,
+                                    // Back left triangles
+                                    27, 29, 28,
+                                    27, 30, 29,
+                                    // Top triangles
+                                    37, 31, 32,
+                                    37, 32, 33,
+                                    37, 33, 34,
+                                    37, 34, 35,
+                                    37, 35, 36,
+                                    37, 36, 31,
+                                };
 
-                            Triangle(parentCell, triangles);
+                            Hexagon(parentCell, triangles);
+
+                            xPos += sizeCell * (Mathf.Sqrt(3f) / 2f) + gutterGrid;
+                        }
+                        if (rowEven)
+                        {
+                            xPos = -sizeCell * (0.5f - Mathf.Sqrt(3f) / 4f);
+                            zPos += sizeCell * 0.75f + gutterGrid;
+                            rowEven = false;
                         }
                         else
                         {
-                            int[] triangles = {
-                                // Bottom triangles
-                                2, 1, 0,
-                                // Back triangles
-                                5, 4, 3,
-                                6, 4, 5,
-                                // Right triangles
-                                9, 8, 7,
-                                10, 9, 7,
-                                // Left triangles
-                                13, 12, 11,
-                                14, 13, 11,
-                                // Top triangles
-                                17, 16, 15,
-                            };
-
-                            Triangle(parentCell, triangles);
+                            xPos = sizeCell * (Mathf.Sqrt(3f) / 4f) - sizeCell * (0.5f - Mathf.Sqrt(3f) / 4f) + gutterGrid / 2;
+                            zPos += sizeCell * 0.75f + gutterGrid;
+                            rowEven = true;
                         }
-
-                        xPos += sizeCell / 2 + gutterGrid;
-                    }
-                    if (triangleUp)
-                    {
-                        triangleUp = false;
-                    }
-                    else
-                    {
-                        triangleUp = true;
                     }
                     xPos = 0f;
-                    zPos += sizeCell + gutterGrid;
-                }
-                xPos = 0f;
-                zPos = 0f;
-                numCell = 0;
-                numPrefab = 0;
-                cellAmount = 0;
-                currentRandomCell = 0;
-                for (int i = 0; i < cellAmount; i++)
-                {
-                    cellPrefab[i] = false;
-                }
-                triangleUp = true;
-            }
-            // Hexagon selected
-            if ((int)shapeSelected == 2)
-            {
-                GameObject parentCell = new GameObject("Grid");
-                xPos = -sizeCell * (0.5f - Mathf.Sqrt(3f) / 4f);
-                for (int j = 0; j < rowsGrid; j++)
-                {
-                    for (int i = 0; i < columnsGrid; i++)
+                    zPos = 0f;
+                    numCell = 0;
+                    numPrefab = 0;
+                    cellAmount = 0;
+                    currentRandomCell = 0;
+                    for (int i = 0; i < cellAmount; i++)
                     {
-                        if (sizePrefab != 0)
-                        {
-                            if (cellPrefab[numCell])
-                            {
-                                numPrefab++;
-                                Vector3 prefabPos = new Vector3(xPos + sizeCell * 0.5f, thicknessCell * 1f, zPos + sizeCell * 0.5f);
-                                GameObject prefabSpawned = (GameObject)Instantiate(prefabSource, prefabPos, Quaternion.identity);
-                                prefabSpawned.name = "Prefab" + numPrefab;
-                                prefabSpawned.transform.parent = parentPrefab.transform;
-                                prefabSpawned.transform.localScale = new Vector3(sizePrefab, sizePrefab, sizePrefab);
-                            }
-                        }
-                        numCell++;
-
-                        //Creating triangle information for mesh
-                        int[] triangles = {
-                            // Bottom triangles
-                            1, 0, 6,
-                            2, 1, 6,
-                            3, 2, 6,
-                            4, 3, 6,
-                            5, 4, 6,
-                            0, 5, 6,
-                            // Back right triangles
-                            7, 9, 8,
-                            7, 10, 9,
-                            // Right triangles
-                            11, 13, 12,
-                            11, 14, 13,
-                            // Front right triangles
-                            15, 17, 16,
-                            15, 18, 17,
-                            // Front left triangles
-                            19, 21, 20,
-                            19, 22, 21,
-                            // Left triangles
-                            23, 25, 24,
-                            23, 26, 25,
-                            // Back left triangles
-                            27, 29, 28,
-                            27, 30, 29,
-                            // Top triangles
-                            37, 31, 32,
-                            37, 32, 33,
-                            37, 33, 34,
-                            37, 34, 35,
-                            37, 35, 36,
-                            37, 36, 31,
-                        };
-
-                        Hexagon(parentCell, triangles);
-
-                        xPos += sizeCell * (Mathf.Sqrt(3f) / 2f) + gutterGrid;
+                        cellPrefab[i] = false;
                     }
-                    if (rowEven)
-                    {
-                        xPos = -sizeCell * (0.5f - Mathf.Sqrt(3f) / 4f);
-                        zPos += sizeCell * 0.75f + gutterGrid;
-                        rowEven = false;
-                    }
-                    else
-                    {
-                        xPos = sizeCell * (Mathf.Sqrt(3f) / 4f) - sizeCell * (0.5f - Mathf.Sqrt(3f) / 4f) + gutterGrid / 2;
-                        zPos += sizeCell * 0.75f + gutterGrid;
-                        rowEven = true;
-                    }
-                }
-                xPos = 0f;
-                zPos = 0f;
-                numCell = 0;
-                numPrefab = 0;
-                cellAmount = 0;
-                currentRandomCell = 0;
-                for (int i = 0; i < cellAmount; i++)
-                {
-                    cellPrefab[i] = false;
-                }
+                    break;
             }
         }
     }
@@ -396,46 +397,46 @@ public class GridSpawner : EditorWindow
         cellObject.transform.parent = parent.transform;
     }
 
-    // Creates a square mesh with a thickness (also considered a cube)
+    // Creates a square mesh with a height (also considered a cube)
     void Square(GameObject parent, int[] triangles)
     {
         // Creating arrays for mesh information
         Vector3[] vertices = {
             // Bottom vertices
-            new Vector3(xPos + sizeCell * 1f, thicknessCell * 0f, zPos + sizeCell * 0f), //0
-            new Vector3(xPos + sizeCell * 0f, thicknessCell * 0f, zPos + sizeCell * 0f), //1
-            new Vector3(xPos + sizeCell * 0f, thicknessCell * 0f, zPos + sizeCell * 1f), //2
-            new Vector3(xPos + sizeCell * 1f, thicknessCell * 0f, zPos + sizeCell * 1f), //3
+            new Vector3(xPos + sizeCell * 1f, heightCell * 0f, zPos + sizeCell * 0f), //0
+            new Vector3(xPos + sizeCell * 0f, heightCell * 0f, zPos + sizeCell * 0f), //1
+            new Vector3(xPos + sizeCell * 0f, heightCell * 0f, zPos + sizeCell * 1f), //2
+            new Vector3(xPos + sizeCell * 1f, heightCell * 0f, zPos + sizeCell * 1f), //3
 
             // Back vertices
-            new Vector3(xPos + sizeCell * 1f, thicknessCell * 0f, zPos + sizeCell * 1f), //4
-            new Vector3(xPos + sizeCell * 0f, thicknessCell * 0f, zPos + sizeCell * 1f), //5
-            new Vector3(xPos + sizeCell * 0f, thicknessCell * 1f, zPos + sizeCell * 1f), //6
-            new Vector3(xPos + sizeCell * 1f, thicknessCell * 1f, zPos + sizeCell * 1f), //7
+            new Vector3(xPos + sizeCell * 1f, heightCell * 0f, zPos + sizeCell * 1f), //4
+            new Vector3(xPos + sizeCell * 0f, heightCell * 0f, zPos + sizeCell * 1f), //5
+            new Vector3(xPos + sizeCell * 0f, heightCell * 1f, zPos + sizeCell * 1f), //6
+            new Vector3(xPos + sizeCell * 1f, heightCell * 1f, zPos + sizeCell * 1f), //7
 
             // Right vertices
-            new Vector3(xPos + sizeCell * 0f, thicknessCell * 0f, zPos + sizeCell * 1f), //8
-            new Vector3(xPos + sizeCell * 0f, thicknessCell * 0f, zPos + sizeCell * 0f), //9
-            new Vector3(xPos + sizeCell * 0f, thicknessCell * 1f, zPos + sizeCell * 0f), //10
-            new Vector3(xPos + sizeCell * 0f, thicknessCell * 1f, zPos + sizeCell * 1f), //11
+            new Vector3(xPos + sizeCell * 0f, heightCell * 0f, zPos + sizeCell * 1f), //8
+            new Vector3(xPos + sizeCell * 0f, heightCell * 0f, zPos + sizeCell * 0f), //9
+            new Vector3(xPos + sizeCell * 0f, heightCell * 1f, zPos + sizeCell * 0f), //10
+            new Vector3(xPos + sizeCell * 0f, heightCell * 1f, zPos + sizeCell * 1f), //11
 
             // Left vertices
-            new Vector3(xPos + sizeCell * 1f, thicknessCell * 0f, zPos + sizeCell * 0f), //12
-            new Vector3(xPos + sizeCell * 1f, thicknessCell * 0f, zPos + sizeCell * 1f), //13
-            new Vector3(xPos + sizeCell * 1f, thicknessCell * 1f, zPos + sizeCell * 1f), //14
-            new Vector3(xPos + sizeCell * 1f, thicknessCell * 1f, zPos + sizeCell * 0f), //15
+            new Vector3(xPos + sizeCell * 1f, heightCell * 0f, zPos + sizeCell * 0f), //12
+            new Vector3(xPos + sizeCell * 1f, heightCell * 0f, zPos + sizeCell * 1f), //13
+            new Vector3(xPos + sizeCell * 1f, heightCell * 1f, zPos + sizeCell * 1f), //14
+            new Vector3(xPos + sizeCell * 1f, heightCell * 1f, zPos + sizeCell * 0f), //15
 
             // Top vertices
-            new Vector3(xPos + sizeCell * 0f, thicknessCell * 1f, zPos + sizeCell * 0f), //16
-            new Vector3(xPos + sizeCell * 1f, thicknessCell * 1f, zPos + sizeCell * 0f), //17
-            new Vector3(xPos + sizeCell * 1f, thicknessCell * 1f, zPos + sizeCell * 1f), //18
-            new Vector3(xPos + sizeCell * 0f, thicknessCell * 1f, zPos + sizeCell * 1f), //19
+            new Vector3(xPos + sizeCell * 0f, heightCell * 1f, zPos + sizeCell * 0f), //16
+            new Vector3(xPos + sizeCell * 1f, heightCell * 1f, zPos + sizeCell * 0f), //17
+            new Vector3(xPos + sizeCell * 1f, heightCell * 1f, zPos + sizeCell * 1f), //18
+            new Vector3(xPos + sizeCell * 0f, heightCell * 1f, zPos + sizeCell * 1f), //19
 
             // Front vertices
-            new Vector3(xPos + sizeCell * 1f, thicknessCell * 1f, zPos + sizeCell * 0f), //20
-            new Vector3(xPos + sizeCell * 0f, thicknessCell * 1f, zPos + sizeCell * 0f), //21
-            new Vector3(xPos + sizeCell * 0f, thicknessCell * 0f, zPos + sizeCell * 0f), //22
-            new Vector3(xPos + sizeCell * 1f, thicknessCell * 0f, zPos + sizeCell * 0f), //23
+            new Vector3(xPos + sizeCell * 1f, heightCell * 1f, zPos + sizeCell * 0f), //20
+            new Vector3(xPos + sizeCell * 0f, heightCell * 1f, zPos + sizeCell * 0f), //21
+            new Vector3(xPos + sizeCell * 0f, heightCell * 0f, zPos + sizeCell * 0f), //22
+            new Vector3(xPos + sizeCell * 1f, heightCell * 0f, zPos + sizeCell * 0f), //23
         };
 
         // Creating mesh
@@ -455,7 +456,7 @@ public class GridSpawner : EditorWindow
         CreateMaterial(parent, cellObject);
     }
 
-    // Creates a triangle mesh with a thickness
+    // Creates a triangle mesh with a height
     void Triangle(GameObject parent, int[] triangles)
     {
         // Checking which way the triangle is facing
@@ -464,32 +465,32 @@ public class GridSpawner : EditorWindow
             // Creating arrays for mesh information
             Vector3[] vertices = {
                 // Bottom vertices
-                new Vector3(xPos + sizeCell * 1f, thicknessCell * 0f, zPos + sizeCell * 0f), //0
-                new Vector3(xPos + sizeCell * 0f, thicknessCell * 0f, zPos + sizeCell * 0f), //1
-                new Vector3(xPos + sizeCell * 0.5f, thicknessCell * 0f, zPos + sizeCell * 1f), //2
+                new Vector3(xPos + sizeCell * 1f, heightCell * 0f, zPos + sizeCell * 0f), //0
+                new Vector3(xPos + sizeCell * 0f, heightCell * 0f, zPos + sizeCell * 0f), //1
+                new Vector3(xPos + sizeCell * 0.5f, heightCell * 0f, zPos + sizeCell * 1f), //2
 
                 // Right vertices
-                new Vector3(xPos + sizeCell * 0.5f, thicknessCell * 0f, zPos + sizeCell * 1f), //3
-                new Vector3(xPos + sizeCell * 0f, thicknessCell * 0f, zPos + sizeCell * 0f), //4
-                new Vector3(xPos + sizeCell * 0f, thicknessCell * 1f, zPos + sizeCell * 0f), //5
-                new Vector3(xPos + sizeCell * 0.5f, thicknessCell * 1f, zPos + sizeCell * 1f), //6
+                new Vector3(xPos + sizeCell * 0.5f, heightCell * 0f, zPos + sizeCell * 1f), //3
+                new Vector3(xPos + sizeCell * 0f, heightCell * 0f, zPos + sizeCell * 0f), //4
+                new Vector3(xPos + sizeCell * 0f, heightCell * 1f, zPos + sizeCell * 0f), //5
+                new Vector3(xPos + sizeCell * 0.5f, heightCell * 1f, zPos + sizeCell * 1f), //6
 
                 // Left vertices
-                new Vector3(xPos + sizeCell * 1f, thicknessCell * 0f, zPos + sizeCell * 0f), //7
-                new Vector3(xPos + sizeCell * 0.5f, thicknessCell * 0f, zPos + sizeCell * 1f), //8
-                new Vector3(xPos + sizeCell * 0.5f, thicknessCell * 1f, zPos + sizeCell * 1f), //9
-                new Vector3(xPos + sizeCell * 1f, thicknessCell * 1f, zPos + sizeCell * 0f), //10
+                new Vector3(xPos + sizeCell * 1f, heightCell * 0f, zPos + sizeCell * 0f), //7
+                new Vector3(xPos + sizeCell * 0.5f, heightCell * 0f, zPos + sizeCell * 1f), //8
+                new Vector3(xPos + sizeCell * 0.5f, heightCell * 1f, zPos + sizeCell * 1f), //9
+                new Vector3(xPos + sizeCell * 1f, heightCell * 1f, zPos + sizeCell * 0f), //10
 
                 // Top vertices
-                new Vector3(xPos + sizeCell * 0f, thicknessCell * 1f, zPos + sizeCell * 0f), //11
-                new Vector3(xPos + sizeCell * 1f, thicknessCell * 1f, zPos + sizeCell * 0f), //12
-                new Vector3(xPos + sizeCell * 0.5f, thicknessCell * 1f, zPos + sizeCell * 1f), //13
+                new Vector3(xPos + sizeCell * 0f, heightCell * 1f, zPos + sizeCell * 0f), //11
+                new Vector3(xPos + sizeCell * 1f, heightCell * 1f, zPos + sizeCell * 0f), //12
+                new Vector3(xPos + sizeCell * 0.5f, heightCell * 1f, zPos + sizeCell * 1f), //13
 
                 // Front vertices
-                new Vector3(xPos + sizeCell * 1f, thicknessCell * 1f, zPos + sizeCell * 0f), //14
-                new Vector3(xPos + sizeCell * 0f, thicknessCell * 1f, zPos + sizeCell * 0f), //15
-                new Vector3(xPos + sizeCell * 0f, thicknessCell * 0f, zPos + sizeCell * 0f), //16
-                new Vector3(xPos + sizeCell * 1f, thicknessCell * 0f, zPos + sizeCell * 0f), //17
+                new Vector3(xPos + sizeCell * 1f, heightCell * 1f, zPos + sizeCell * 0f), //14
+                new Vector3(xPos + sizeCell * 0f, heightCell * 1f, zPos + sizeCell * 0f), //15
+                new Vector3(xPos + sizeCell * 0f, heightCell * 0f, zPos + sizeCell * 0f), //16
+                new Vector3(xPos + sizeCell * 1f, heightCell * 0f, zPos + sizeCell * 0f), //17
             };
 
             // Creating mesh
@@ -515,32 +516,32 @@ public class GridSpawner : EditorWindow
             // Creating arrays for mesh information
             Vector3[] vertices = {
                 // Bottom vertices
-                new Vector3(xPos + sizeCell * 0.5f, thicknessCell * 0f, zPos + sizeCell * 0f), //0
-                new Vector3(xPos + sizeCell * 1f, thicknessCell * 0f, zPos + sizeCell * 1f), //1
-                new Vector3(xPos + sizeCell * 0f, thicknessCell * 0f, zPos + sizeCell * 1f), //2
+                new Vector3(xPos + sizeCell * 0.5f, heightCell * 0f, zPos + sizeCell * 0f), //0
+                new Vector3(xPos + sizeCell * 1f, heightCell * 0f, zPos + sizeCell * 1f), //1
+                new Vector3(xPos + sizeCell * 0f, heightCell * 0f, zPos + sizeCell * 1f), //2
 
                 // Back vertices
-                new Vector3(xPos + sizeCell * 1f, thicknessCell * 0f, zPos + sizeCell * 1f), //3
-                new Vector3(xPos + sizeCell * 0f, thicknessCell * 0f, zPos + sizeCell * 1f), //4
-                new Vector3(xPos + sizeCell * 1f, thicknessCell * 1f, zPos + sizeCell * 1f), //5
-                new Vector3(xPos + sizeCell * 0f, thicknessCell * 1f, zPos + sizeCell * 1f), //6
+                new Vector3(xPos + sizeCell * 1f, heightCell * 0f, zPos + sizeCell * 1f), //3
+                new Vector3(xPos + sizeCell * 0f, heightCell * 0f, zPos + sizeCell * 1f), //4
+                new Vector3(xPos + sizeCell * 1f, heightCell * 1f, zPos + sizeCell * 1f), //5
+                new Vector3(xPos + sizeCell * 0f, heightCell * 1f, zPos + sizeCell * 1f), //6
 
                 // Right vertices
-                new Vector3(xPos + sizeCell * 0f, thicknessCell * 0f, zPos + sizeCell * 1f), //7
-                new Vector3(xPos + sizeCell * 0.5f, thicknessCell * 0f, zPos + sizeCell * 0f), //8
-                new Vector3(xPos + sizeCell * 0.5f, thicknessCell * 1f, zPos + sizeCell * 0f), //9
-                new Vector3(xPos + sizeCell * 0f, thicknessCell * 1f, zPos + sizeCell * 1f), //10
+                new Vector3(xPos + sizeCell * 0f, heightCell * 0f, zPos + sizeCell * 1f), //7
+                new Vector3(xPos + sizeCell * 0.5f, heightCell * 0f, zPos + sizeCell * 0f), //8
+                new Vector3(xPos + sizeCell * 0.5f, heightCell * 1f, zPos + sizeCell * 0f), //9
+                new Vector3(xPos + sizeCell * 0f, heightCell * 1f, zPos + sizeCell * 1f), //10
 
                 // Left vertices
-                new Vector3(xPos + sizeCell * 0.5f, thicknessCell * 0f, zPos + sizeCell * 0f), //11
-                new Vector3(xPos + sizeCell * 1f, thicknessCell * 0f, zPos + sizeCell * 1f), //12
-                new Vector3(xPos + sizeCell * 1f, thicknessCell * 1f, zPos + sizeCell * 1f), //13
-                new Vector3(xPos + sizeCell * 0.5f, thicknessCell * 1f, zPos + sizeCell * 0f), //14
+                new Vector3(xPos + sizeCell * 0.5f, heightCell * 0f, zPos + sizeCell * 0f), //11
+                new Vector3(xPos + sizeCell * 1f, heightCell * 0f, zPos + sizeCell * 1f), //12
+                new Vector3(xPos + sizeCell * 1f, heightCell * 1f, zPos + sizeCell * 1f), //13
+                new Vector3(xPos + sizeCell * 0.5f, heightCell * 1f, zPos + sizeCell * 0f), //14
 
                 // Top vertices
-                new Vector3(xPos + sizeCell * 0.5f, thicknessCell * 1f, zPos + sizeCell * 0f), //15
-                new Vector3(xPos + sizeCell * 1f, thicknessCell * 1f, zPos + sizeCell * 1f), //16
-                new Vector3(xPos + sizeCell * 0f, thicknessCell * 1f, zPos + sizeCell * 1f), //17
+                new Vector3(xPos + sizeCell * 0.5f, heightCell * 1f, zPos + sizeCell * 0f), //15
+                new Vector3(xPos + sizeCell * 1f, heightCell * 1f, zPos + sizeCell * 1f), //16
+                new Vector3(xPos + sizeCell * 0f, heightCell * 1f, zPos + sizeCell * 1f), //17
             };
 
             // Creating mesh
@@ -563,64 +564,64 @@ public class GridSpawner : EditorWindow
         }
     }
 
-    // Creates a hexagon mesh with a thickness
+    // Creates a hexagon mesh with a height
     void Hexagon(GameObject parent, int[] triangles)
     {
         // Creating arrays for mesh information
         Vector3[] vertices = {
         // Bottom vertices
-        new Vector3(xPos + sizeCell * 0.5f, thicknessCell * 0f, zPos + sizeCell * 1f), //0
-        new Vector3(xPos + sizeCell * (0.5f + Mathf.Sqrt(3f) / 4f), thicknessCell * 0f, zPos + sizeCell * 0.75f), //1
-        new Vector3(xPos + sizeCell * (0.5f + Mathf.Sqrt(3f) / 4f), thicknessCell * 0f, zPos + sizeCell * 0.25f), //2
-        new Vector3(xPos + sizeCell * 0.5f, thicknessCell * 0f, zPos + sizeCell * 0f), //3
-        new Vector3(xPos + sizeCell * (0.5f - Mathf.Sqrt(3f) / 4f), thicknessCell * 0f, zPos + sizeCell * 0.25f), //4
-        new Vector3(xPos + sizeCell * (0.5f - Mathf.Sqrt(3f) / 4f), thicknessCell * 0f, zPos + sizeCell * 0.75f), //5
-        new Vector3(xPos + sizeCell * 0.5f, thicknessCell * 0f, zPos + sizeCell * 0.5f), //6
+        new Vector3(xPos + sizeCell * 0.5f, heightCell * 0f, zPos + sizeCell * 1f), //0
+        new Vector3(xPos + sizeCell * (0.5f + Mathf.Sqrt(3f) / 4f), heightCell * 0f, zPos + sizeCell * 0.75f), //1
+        new Vector3(xPos + sizeCell * (0.5f + Mathf.Sqrt(3f) / 4f), heightCell * 0f, zPos + sizeCell * 0.25f), //2
+        new Vector3(xPos + sizeCell * 0.5f, heightCell * 0f, zPos + sizeCell * 0f), //3
+        new Vector3(xPos + sizeCell * (0.5f - Mathf.Sqrt(3f) / 4f), heightCell * 0f, zPos + sizeCell * 0.25f), //4
+        new Vector3(xPos + sizeCell * (0.5f - Mathf.Sqrt(3f) / 4f), heightCell * 0f, zPos + sizeCell * 0.75f), //5
+        new Vector3(xPos + sizeCell * 0.5f, heightCell * 0f, zPos + sizeCell * 0.5f), //6
         
         // Back right vertices
-        new Vector3(xPos + sizeCell * 0.5f, thicknessCell * 0f, zPos + sizeCell * 1f), //7
-        new Vector3(xPos + sizeCell * (0.5f - Mathf.Sqrt(3f) / 4f), thicknessCell * 0f, zPos + sizeCell * 0.75f), //8
-        new Vector3(xPos + sizeCell * (0.5f - Mathf.Sqrt(3f) / 4f), thicknessCell * 1f, zPos + sizeCell * 0.75f), //9
-        new Vector3(xPos + sizeCell * 0.5f, thicknessCell * 1f, zPos + sizeCell * 1f), //10
+        new Vector3(xPos + sizeCell * 0.5f, heightCell * 0f, zPos + sizeCell * 1f), //7
+        new Vector3(xPos + sizeCell * (0.5f - Mathf.Sqrt(3f) / 4f), heightCell * 0f, zPos + sizeCell * 0.75f), //8
+        new Vector3(xPos + sizeCell * (0.5f - Mathf.Sqrt(3f) / 4f), heightCell * 1f, zPos + sizeCell * 0.75f), //9
+        new Vector3(xPos + sizeCell * 0.5f, heightCell * 1f, zPos + sizeCell * 1f), //10
 
         // Right vertices
-        new Vector3(xPos + sizeCell * (0.5f - Mathf.Sqrt(3f) / 4f), thicknessCell * 0f, zPos + sizeCell * 0.75f), //11
-        new Vector3(xPos + sizeCell * (0.5f - Mathf.Sqrt(3f) / 4f), thicknessCell * 0f, zPos + sizeCell * 0.25f), //12
-        new Vector3(xPos + sizeCell * (0.5f - Mathf.Sqrt(3f) / 4f), thicknessCell * 1f, zPos + sizeCell * 0.25f), //13
-        new Vector3(xPos + sizeCell * (0.5f - Mathf.Sqrt(3f) / 4f), thicknessCell * 1f, zPos + sizeCell * 0.75f), //14
+        new Vector3(xPos + sizeCell * (0.5f - Mathf.Sqrt(3f) / 4f), heightCell * 0f, zPos + sizeCell * 0.75f), //11
+        new Vector3(xPos + sizeCell * (0.5f - Mathf.Sqrt(3f) / 4f), heightCell * 0f, zPos + sizeCell * 0.25f), //12
+        new Vector3(xPos + sizeCell * (0.5f - Mathf.Sqrt(3f) / 4f), heightCell * 1f, zPos + sizeCell * 0.25f), //13
+        new Vector3(xPos + sizeCell * (0.5f - Mathf.Sqrt(3f) / 4f), heightCell * 1f, zPos + sizeCell * 0.75f), //14
 
         // Front right vertices
-        new Vector3(xPos + sizeCell * (0.5f - Mathf.Sqrt(3f) / 4f), thicknessCell * 0f, zPos + sizeCell * 0.25f), //15
-        new Vector3(xPos + sizeCell * 0.5f, thicknessCell * 0f, zPos + sizeCell * 0f), //16
-        new Vector3(xPos + sizeCell * 0.5f, thicknessCell * 1f, zPos + sizeCell * 0f), //17
-        new Vector3(xPos + sizeCell * (0.5f - Mathf.Sqrt(3f) / 4f), thicknessCell * 1f, zPos + sizeCell * 0.25f), //18
+        new Vector3(xPos + sizeCell * (0.5f - Mathf.Sqrt(3f) / 4f), heightCell * 0f, zPos + sizeCell * 0.25f), //15
+        new Vector3(xPos + sizeCell * 0.5f, heightCell * 0f, zPos + sizeCell * 0f), //16
+        new Vector3(xPos + sizeCell * 0.5f, heightCell * 1f, zPos + sizeCell * 0f), //17
+        new Vector3(xPos + sizeCell * (0.5f - Mathf.Sqrt(3f) / 4f), heightCell * 1f, zPos + sizeCell * 0.25f), //18
 
         // Front left vertices
-        new Vector3(xPos + sizeCell * 0.5f, thicknessCell * 0f, zPos + sizeCell * 0f), //19
-        new Vector3(xPos + sizeCell * (0.5f + Mathf.Sqrt(3f) / 4f), thicknessCell * 0f, zPos + sizeCell * 0.25f), //20
-        new Vector3(xPos + sizeCell * (0.5f + Mathf.Sqrt(3f) / 4f), thicknessCell * 1f, zPos + sizeCell * 0.25f), //21
-        new Vector3(xPos + sizeCell * 0.5f, thicknessCell * 1f, zPos + sizeCell * 0f), //22
+        new Vector3(xPos + sizeCell * 0.5f, heightCell * 0f, zPos + sizeCell * 0f), //19
+        new Vector3(xPos + sizeCell * (0.5f + Mathf.Sqrt(3f) / 4f), heightCell * 0f, zPos + sizeCell * 0.25f), //20
+        new Vector3(xPos + sizeCell * (0.5f + Mathf.Sqrt(3f) / 4f), heightCell * 1f, zPos + sizeCell * 0.25f), //21
+        new Vector3(xPos + sizeCell * 0.5f, heightCell * 1f, zPos + sizeCell * 0f), //22
 
         // Left vertices
-        new Vector3(xPos + sizeCell * (0.5f + Mathf.Sqrt(3f) / 4f), thicknessCell * 0f, zPos + sizeCell * 0.25f), //23
-        new Vector3(xPos + sizeCell * (0.5f + Mathf.Sqrt(3f) / 4f), thicknessCell * 0f, zPos + sizeCell * 0.75f), //24
-        new Vector3(xPos + sizeCell * (0.5f + Mathf.Sqrt(3f) / 4f), thicknessCell * 1f, zPos + sizeCell * 0.75f), //25
-        new Vector3(xPos + sizeCell * (0.5f + Mathf.Sqrt(3f) / 4f), thicknessCell * 1f, zPos + sizeCell * 0.25f), //26
+        new Vector3(xPos + sizeCell * (0.5f + Mathf.Sqrt(3f) / 4f), heightCell * 0f, zPos + sizeCell * 0.25f), //23
+        new Vector3(xPos + sizeCell * (0.5f + Mathf.Sqrt(3f) / 4f), heightCell * 0f, zPos + sizeCell * 0.75f), //24
+        new Vector3(xPos + sizeCell * (0.5f + Mathf.Sqrt(3f) / 4f), heightCell * 1f, zPos + sizeCell * 0.75f), //25
+        new Vector3(xPos + sizeCell * (0.5f + Mathf.Sqrt(3f) / 4f), heightCell * 1f, zPos + sizeCell * 0.25f), //26
 
         // Back left vertices
-        new Vector3(xPos + sizeCell * (0.5f + Mathf.Sqrt(3f) / 4f), thicknessCell * 0f, zPos + sizeCell * 0.75f), //27
-        new Vector3(xPos + sizeCell * 0.5f, thicknessCell * 0f, zPos + sizeCell * 1f), //28
-        new Vector3(xPos + sizeCell * 0.5f, thicknessCell * 1f, zPos + sizeCell * 1f), //29
-        new Vector3(xPos + sizeCell * (0.5f + Mathf.Sqrt(3f) / 4f), thicknessCell * 1f, zPos + sizeCell * 0.75f), //30
+        new Vector3(xPos + sizeCell * (0.5f + Mathf.Sqrt(3f) / 4f), heightCell * 0f, zPos + sizeCell * 0.75f), //27
+        new Vector3(xPos + sizeCell * 0.5f, heightCell * 0f, zPos + sizeCell * 1f), //28
+        new Vector3(xPos + sizeCell * 0.5f, heightCell * 1f, zPos + sizeCell * 1f), //29
+        new Vector3(xPos + sizeCell * (0.5f + Mathf.Sqrt(3f) / 4f), heightCell * 1f, zPos + sizeCell * 0.75f), //30
 
         // Bottom vertices
-        new Vector3(xPos + sizeCell * 0.5f, thicknessCell * 1f, zPos + sizeCell * 1f), //31
-        new Vector3(xPos + sizeCell * (0.5f + Mathf.Sqrt(3f) / 4f), thicknessCell * 1f, zPos + sizeCell * 0.75f), //32
-        new Vector3(xPos + sizeCell * (0.5f + Mathf.Sqrt(3f) / 4f), thicknessCell * 1f, zPos + sizeCell * 0.25f), //33
-        new Vector3(xPos + sizeCell * 0.5f, thicknessCell * 1f, zPos + sizeCell * 0f), //34
-        new Vector3(xPos + sizeCell * (0.5f - Mathf.Sqrt(3f) / 4f), thicknessCell * 1f, zPos + sizeCell * 0.25f), //35
-        new Vector3(xPos + sizeCell * (0.5f - Mathf.Sqrt(3f) / 4f), thicknessCell * 1f, zPos + sizeCell * 0.75f), //36
-        new Vector3(xPos + sizeCell * 0.5f, thicknessCell * 1f, zPos + sizeCell * 0.5f), //37
+        new Vector3(xPos + sizeCell * 0.5f, heightCell * 1f, zPos + sizeCell * 1f), //31
+        new Vector3(xPos + sizeCell * (0.5f + Mathf.Sqrt(3f) / 4f), heightCell * 1f, zPos + sizeCell * 0.75f), //32
+        new Vector3(xPos + sizeCell * (0.5f + Mathf.Sqrt(3f) / 4f), heightCell * 1f, zPos + sizeCell * 0.25f), //33
+        new Vector3(xPos + sizeCell * 0.5f, heightCell * 1f, zPos + sizeCell * 0f), //34
+        new Vector3(xPos + sizeCell * (0.5f - Mathf.Sqrt(3f) / 4f), heightCell * 1f, zPos + sizeCell * 0.25f), //35
+        new Vector3(xPos + sizeCell * (0.5f - Mathf.Sqrt(3f) / 4f), heightCell * 1f, zPos + sizeCell * 0.75f), //36
+        new Vector3(xPos + sizeCell * 0.5f, heightCell * 1f, zPos + sizeCell * 0.5f), //37
         };
 
         // Creating mesh
