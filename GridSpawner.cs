@@ -12,8 +12,8 @@ public enum shapeGrid
 
 public enum matGrid
 {
-    Standard = 0,
-    HDRP = 1,
+    Standard,
+    HDRP,
 }
 
 public class GridSpawner : EditorWindow
@@ -130,9 +130,9 @@ public class GridSpawner : EditorWindow
             {
                 // Square selected
                 case shapeGrid.Square:
-                    for (int j = 0; j < rowsGrid; j++)
+                    for (int row = 0; row < rowsGrid; row++)
                     {
-                        for (int i = 0; i < columnsGrid; i++)
+                        for (int column = 0; column < columnsGrid; column++)
                         {
                             if (sizePrefab != 0)
                             {
@@ -183,17 +183,17 @@ public class GridSpawner : EditorWindow
                     numPrefab = 0;
                     cellAmount = 0;
                     currentRandomCell = 0;
-                    for (int i = 0; i < cellAmount; i++)
+                    for (int cell = 0; cell < cellAmount; cell++)
                     {
-                        cellPrefab[i] = false;
+                        cellPrefab[cell] = false;
                     }
                     break;
 
                 // Triangle selected
                 case shapeGrid.Triangle:
-                    for (int j = 0; j < rowsGrid; j++)
+                    for (int row = 0; row < rowsGrid; row++)
                     {
-                        for (int i = 0; i < columnsGrid; i++)
+                        for (int column = 0; column < columnsGrid; column++)
                         {
                             if (sizePrefab != 0)
                             {
@@ -279,9 +279,9 @@ public class GridSpawner : EditorWindow
                     numPrefab = 0;
                     cellAmount = 0;
                     currentRandomCell = 0;
-                    for (int i = 0; i < cellAmount; i++)
+                    for (int cell = 0; cell < cellAmount; cell++)
                     {
-                        cellPrefab[i] = false;
+                        cellPrefab[cell] = false;
                     }
                     triangleUp = true;
                     break;
@@ -289,9 +289,9 @@ public class GridSpawner : EditorWindow
                 // Hexagon selected
                 case shapeGrid.Hexagon:
                     xPos = -sizeCell * (0.5f - Mathf.Sqrt(3f) / 4f);
-                    for (int j = 0; j < rowsGrid; j++)
+                    for (int row = 0; row < rowsGrid; row++)
                     {
-                        for (int i = 0; i < columnsGrid; i++)
+                        for (int column = 0; column < columnsGrid; column++)
                         {
                             if (sizePrefab != 0)
                             {
@@ -366,9 +366,9 @@ public class GridSpawner : EditorWindow
                     numPrefab = 0;
                     cellAmount = 0;
                     currentRandomCell = 0;
-                    for (int i = 0; i < cellAmount; i++)
+                    for (int cell = 0; cell < cellAmount; cell++)
                     {
-                        cellPrefab[i] = false;
+                        cellPrefab[cell] = false;
                     }
                     break;
             }
@@ -378,15 +378,16 @@ public class GridSpawner : EditorWindow
     void CreateMaterial(GameObject parent, GameObject cellObject)
     {
         // Checks which shader is selected, and then creates a material
-        if ((int)matShaderSelected == 0)
+        switch (matShaderSelected)
         {
-            cellObject.GetComponent<MeshRenderer>().material = new Material(Shader.Find("Standard"));
-        }
-        if ((int)matShaderSelected == 1)
-        {
-            cellObject.GetComponent<MeshRenderer>().material = new Material(Shader.Find("HDRP/Lit"));
-        }
+            case matGrid.Standard:
+                cellObject.GetComponent<MeshRenderer>().material = new Material(Shader.Find("Standard"));
+                break;
 
+            case matGrid.HDRP:
+                cellObject.GetComponent<MeshRenderer>().material = new Material(Shader.Find("HDRP/Lit"));
+                break;
+        }
         cellObject.transform.parent = parent.transform;
     }
 
@@ -638,7 +639,7 @@ public class GridSpawner : EditorWindow
 
     void RandomPick()
     {
-        for (int i = 0; i < columnsGrid * rowsGrid; i++)
+        for (int randomAmount = 0; randomAmount < columnsGrid * rowsGrid; randomAmount++)
         {
             if (currentRandomCell < cellAmount)
             {
@@ -654,7 +655,7 @@ public class GridSpawner : EditorWindow
                 }
                 else
                 {
-                    i--;
+                    randomAmount--;
                 }
             }
         }
