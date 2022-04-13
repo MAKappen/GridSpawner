@@ -137,7 +137,8 @@ public class GridSpawner : EditorWindow
                             if (cellPrefab[numCell])
                             {
                                 numPrefab++;
-                                GameObject prefabSpawned = (GameObject)Instantiate(prefabSource, new Vector3(xPos + sizeCell * 0.5f, thicknessCell * 1f, zPos + sizeCell * 0.5f), Quaternion.identity);
+                                Vector3 prefabPos = new Vector3(xPos + sizeCell * 0.5f, thicknessCell * 1f, zPos + sizeCell * 0.5f);
+                                GameObject prefabSpawned = (GameObject)Instantiate(prefabSource, prefabPos, Quaternion.identity);
                                 prefabSpawned.name = "Man" + numPrefab;
                                 prefabSpawned.transform.parent = parentPrefab.transform;
                                 prefabSpawned.transform.localScale = new Vector3(sizePrefab, sizePrefab, sizePrefab);
@@ -175,8 +176,9 @@ public class GridSpawner : EditorWindow
                             {
                                 if (cellPrefab[numCell])
                                 {
-                                    GameObject prefabSpawned = (GameObject)Instantiate(prefabSource, new Vector3(xPos + sizeCell * 0.5f, thicknessCell * 1f, zPos + sizeCell * 0.33f), Quaternion.identity);
                                     numPrefab++;
+                                    Vector3 prefabPos = new Vector3(xPos + sizeCell * 0.5f, thicknessCell * 1f, zPos + sizeCell * 0.33f);
+                                    GameObject prefabSpawned = (GameObject)Instantiate(prefabSource, prefabPos, Quaternion.identity);
                                     prefabSpawned.name = "Man" + numPrefab;
                                     prefabSpawned.transform.parent = parentPrefab.transform;
                                     prefabSpawned.transform.localScale = new Vector3(sizePrefab, sizePrefab, sizePrefab);
@@ -186,8 +188,9 @@ public class GridSpawner : EditorWindow
                             {
                                 if (cellPrefab[numCell])
                                 {
-                                    GameObject prefabSpawned = (GameObject)Instantiate(prefabSource, new Vector3(xPos + sizeCell * 0.5f, thicknessCell * 1f, zPos + sizeCell * 0.67f), Quaternion.identity);
                                     numPrefab++;
+                                    Vector3 prefabPos = new Vector3(xPos + sizeCell * 0.5f, thicknessCell * 1f, zPos + sizeCell * 0.67f);
+                                    GameObject prefabSpawned = (GameObject)Instantiate(prefabSource, prefabPos, Quaternion.identity);
                                     prefabSpawned.name = "Man" + numPrefab;
                                     prefabSpawned.transform.parent = parentPrefab.transform;
                                     prefabSpawned.transform.localScale = new Vector3(sizePrefab, sizePrefab, sizePrefab);
@@ -246,8 +249,9 @@ public class GridSpawner : EditorWindow
                         {
                             if (cellPrefab[numCell])
                             {
-                                GameObject prefabSpawned = (GameObject)Instantiate(prefabSource, new Vector3(xPos + sizeCell * 0.5f, thicknessCell * 1f, zPos + sizeCell * 0.5f), Quaternion.identity);
                                 numPrefab++;
+                                Vector3 prefabPos = new Vector3(xPos + sizeCell * 0.5f, thicknessCell * 1f, zPos + sizeCell * 0.5f);
+                                GameObject prefabSpawned = (GameObject)Instantiate(prefabSource, prefabPos, Quaternion.identity);
                                 prefabSpawned.name = "Man" + numPrefab;
                                 prefabSpawned.transform.parent = parentPrefab.transform;
                                 prefabSpawned.transform.localScale = new Vector3(sizePrefab, sizePrefab, sizePrefab);
