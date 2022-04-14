@@ -18,30 +18,30 @@ public enum MatGrid
 
 public class GridSpawner : EditorWindow
 {
-    string baseNameCell;
-    public MatGrid matShaderSelected;
-    public ShapeGrid shapeSelected;
-    float sizeCell;
-    float heightCell;
-    int rowsGrid;
-    int columnsGrid;
-    float gutterGrid;
-    public Object prefabSource;
-    float sizePrefab;
-    int amountRandom;
+    private string baseNameCell; //Every cell object will be named with this string input
+    private MatGrid matShaderSelected; //Stores which option is selected for the material
+    private ShapeGrid shapeSelected; //Stores which option is selected for the shape of every cell
+    private float sizeCell; //Every cell will base its length and width on this value
+    private float heightCell; //Every cell will take this value as its height, unless randomized (in case, this value will be the average height of all cells)
+    private int rowsGrid; //Amount of rows present in the grid
+    private int columnsGrid; //Amount of columns present in the grid
+    private float gutterGrid; //Size of the gutter between the cells
+    private Object prefabSource; //The prefab that will be placed randomly on the grid, unless amountRandom is set to 0
+    private float sizePrefab; //Every prefab will scale its size based on this value
+    private int amountRandom; //Percentage of prefabs placed relative to the amount of cells present in the grid
 
-    float xPos;
-    float zPos;
-    bool triangleUp;
-    bool rowEven;
+    private float xPos; //x position used to place current cell
+    private float zPos; //z position used to place current cell
+    private bool triangleUp; //Decides whether a cell with a triangle shape is facing upwards or not to fit a triangle grid
+    private bool rowEven; //Decides whether the current row with cells with a hexagon shape is an even number (2nd, 4th, 6th...row)
 
-    int numCell;
-    int numPrefab;
+    private int numCell; //Number of cell used to decide whether current cell needs a prefab
+    private int numPrefab; //Number used to name all prefabs ("Prefab" + numPrefab)
 
-    float cellAmount;
-    int currentRandomCell;
-    float placePrefab;
-    bool[] cellPrefab;
+    private float cellAmount; //Determines how many cells need to have a prefab placed on them
+    private int currentRandomCell; //Determines how many prefabs have already been placed and how many more need to be placed
+    private float placePrefab; //Random number that decides which cell the tool will try to place a prefab
+    private bool[] cellPrefab; //Stores which cells have a prefab on them already
 
     [MenuItem("Window/Grid Spawner")]
     static void OpenWindow()
@@ -103,67 +103,61 @@ public class GridSpawner : EditorWindow
             {
                 // Square selected
                 case ShapeGrid.Square:
-                    for (int row = 0; row < rowsGrid; row++)
+                    int row = 0;
+                    int column = 0;
+                    while (row < rowsGrid)
                     {
-                        for (int column = 0; column < columnsGrid; column++)
+                        while (column < columnsGrid)
                         {
                             if (sizePrefab != 0 && cellPrefab[numCell])
                             {
                                 numPrefab++;
                                 Vector3 prefabPos = new Vector3(xPos + sizeCell * 0.5f, heightCell * 1f, zPos + sizeCell * 0.5f);
-                                GameObject prefabSpawned = (GameObject)Instantiate(prefabSource, prefabPos, Quaternion.identity);
-                                prefabSpawned.name = "Prefab" + numPrefab;
-                                prefabSpawned.transform.parent = parentPrefab.transform;
-                                prefabSpawned.transform.localScale = new Vector3(sizePrefab, sizePrefab, sizePrefab);
+                                InstantiatePrefab(prefabPos, parentPrefab);
                             }
                             numCell++;
 
                             //Creating triangle information for mesh
                             int[] triangles = {
-                                    // Bottom triangles
-                                    2, 1, 0,
-                                    3, 2, 0,
-                                    // Back triangles
-                                    6, 5, 4,
-                                    7, 6, 4,
-                                    // Right triangles
-                                    10, 9, 8,
-                                    11, 10, 8,
-                                    // Left triangles
-                                    14, 13, 12,
-                                    15, 14, 12,
-                                    // Top triangles
-                                    18, 17, 16,
-                                    19, 18, 16,
-                                    // Front triangles
-                                    22, 21, 20,
-                                    23, 22, 20,
-                                };
+                                // Bottom triangles
+                                2, 1, 0,
+                                3, 2, 0,
+                                // Back triangles
+                                6, 5, 4,
+                                7, 6, 4,
+                                // Right triangles
+                                10, 9, 8,
+                                11, 10, 8,
+                                // Left triangles
+                                14, 13, 12,
+                                15, 14, 12,
+                                // Top triangles
+                                18, 17, 16,
+                                19, 18, 16,
+                                // Front triangles
+                                22, 21, 20,
+                                23, 22, 20,
+                            };
 
                             Square(parentCell, triangles);
 
                             xPos += sizeCell + gutterGrid;
+                            column++;
                         }
                         xPos = 0f;
                         zPos += sizeCell + gutterGrid;
+                        row++;
                     }
-                    xPos = 0f;
-                    zPos = 0f;
-                    numCell = 0;
-                    numPrefab = 0;
-                    cellAmount = 0;
-                    currentRandomCell = 0;
-                    for (int cell = 0; cell < cellAmount; cell++)
-                    {
-                        cellPrefab[cell] = false;
-                    }
+                    ResetValues();
                     break;
 
                 // Triangle selected
                 case ShapeGrid.Triangle:
-                    for (int row = 0; row < rowsGrid; row++)
+                    row = 0;
+                    column = 0;
+                    while (row < rowsGrid)
                     {
-                        for (int column = 0; column < columnsGrid; column++)
+                        while (column < columnsGrid)
                         {
                             if (sizePrefab != 0 && cellPrefab[numCell])
                             {
@@ -171,20 +165,14 @@ public class GridSpawner : EditorWindow
                                 {
                                     numPrefab++;
                                     Vector3 prefabPos = new Vector3(xPos + sizeCell * 0.5f, heightCell * 1f, zPos + sizeCell * 0.33f);
-                                    GameObject prefabSpawned = (GameObject)Instantiate(prefabSource, prefabPos, Quaternion.identity);
-                                    prefabSpawned.name = "Prefab" + numPrefab;
-                                    prefabSpawned.transform.parent = parentPrefab.transform;
-                                    prefabSpawned.transform.localScale = new Vector3(sizePrefab, sizePrefab, sizePrefab);
+                                    InstantiatePrefab(prefabPos, parentPrefab);
                                 }
                                 else
                                 {
                                     numPrefab++;
                                     Vector3 prefabPos = new Vector3(xPos + sizeCell * 0.5f, heightCell * 1f, zPos + sizeCell * 0.67f);
                                     GameObject prefabSpawned = (GameObject)Instantiate(prefabSource, prefabPos, Quaternion.identity);
-                                    prefabSpawned.name = "Prefab" + numPrefab;
-                                    prefabSpawned.transform.parent = parentPrefab.transform;
-                                    prefabSpawned.transform.localScale = new Vector3(sizePrefab, sizePrefab, sizePrefab);
-                                    prefabSpawned.transform.localRotation = Quaternion.Euler(0, 180, 0);
+                                    InstantiatePrefab(prefabPos, parentPrefab);
                                 }
                             }
                             numCell++;
@@ -193,120 +181,113 @@ public class GridSpawner : EditorWindow
                             if (triangleUp)
                             {
                                 int[] triangles = {
-                                        // Bottom triangles
-                                        2, 1, 0,
-                                        // Right triangles
-                                        5, 4, 3,
-                                        6, 5, 3,
-                                        // Left triangles
-                                        9, 8, 7,
-                                        10, 9, 7,
-                                        // Top triangles
-                                        13, 12, 11,
-                                        // Front triangles
-                                        16, 15, 14,
-                                        17, 16, 14,
-                                    };
+                                    // Bottom triangles
+                                    2, 1, 0,
+                                    // Right triangles
+                                    5, 4, 3,
+                                    6, 5, 3,
+                                    // Left triangles
+                                    9, 8, 7,
+                                    10, 9, 7,
+                                    // Top triangles
+                                    13, 12, 11,
+                                    // Front triangles
+                                    16, 15, 14,
+                                    17, 16, 14,
+                                };
 
                                 Triangle(parentCell, triangles);
                             }
                             else
                             {
                                 int[] triangles = {
-                                        // Bottom triangles
-                                        2, 1, 0,
-                                        // Back triangles
-                                        5, 4, 3,
-                                        6, 4, 5,
-                                        // Right triangles
-                                        9, 8, 7,
-                                        10, 9, 7,
-                                        // Left triangles
-                                        13, 12, 11,
-                                        14, 13, 11,
-                                        // Top triangles
-                                        17, 16, 15,
-                                    };
+                                    // Bottom triangles
+                                    2, 1, 0,
+                                    // Back triangles
+                                    5, 4, 3,
+                                    6, 4, 5,
+                                    // Right triangles
+                                    9, 8, 7,
+                                    10, 9, 7,
+                                    // Left triangles
+                                    13, 12, 11,
+                                    14, 13, 11,
+                                    // Top triangles
+                                    17, 16, 15,
+                                };
 
                                 Triangle(parentCell, triangles);
                             }
 
                             xPos += sizeCell / 2 + gutterGrid;
+                            column++;
                         }
                         triangleUp = !triangleUp;
                         xPos = 0f;
                         zPos += sizeCell + gutterGrid;
+                        row++;
                     }
-                    xPos = 0f;
-                    zPos = 0f;
-                    numCell = 0;
-                    numPrefab = 0;
-                    cellAmount = 0;
-                    currentRandomCell = 0;
-                    for (int cell = 0; cell < cellAmount; cell++)
-                    {
-                        cellPrefab[cell] = false;
-                    }
+                    ResetValues();
                     triangleUp = true;
                     break;
 
                 // Hexagon selected
                 case ShapeGrid.Hexagon:
                     xPos = -sizeCell * (0.5f - Mathf.Sqrt(3f) / 4f);
-                    for (int row = 0; row < rowsGrid; row++)
+                    row = 0;
+                    column = 0;
+                    while (row < rowsGrid)
                     {
-                        for (int column = 0; column < columnsGrid; column++)
+                        while (column < columnsGrid)
                         {
                             if (sizePrefab != 0 && cellPrefab[numCell])
                             {
                                 numPrefab++;
                                 Vector3 prefabPos = new Vector3(xPos + sizeCell * 0.5f, heightCell * 1f, zPos + sizeCell * 0.5f);
-                                GameObject prefabSpawned = (GameObject)Instantiate(prefabSource, prefabPos, Quaternion.identity);
-                                prefabSpawned.name = "Prefab" + numPrefab;
-                                prefabSpawned.transform.parent = parentPrefab.transform;
-                                prefabSpawned.transform.localScale = new Vector3(sizePrefab, sizePrefab, sizePrefab);
+                                InstantiatePrefab(prefabPos, parentPrefab);
                             }
                             numCell++;
 
                             //Creating triangle information for mesh
                             int[] triangles = {
-                                    // Bottom triangles
-                                    1, 0, 6,
-                                    2, 1, 6,
-                                    3, 2, 6,
-                                    4, 3, 6,
-                                    5, 4, 6,
-                                    0, 5, 6,
-                                    // Back right triangles
-                                    7, 9, 8,
-                                    7, 10, 9,
-                                    // Right triangles
-                                    11, 13, 12,
-                                    11, 14, 13,
-                                    // Front right triangles
-                                    15, 17, 16,
-                                    15, 18, 17,
-                                    // Front left triangles
-                                    19, 21, 20,
-                                    19, 22, 21,
-                                    // Left triangles
-                                    23, 25, 24,
-                                    23, 26, 25,
-                                    // Back left triangles
-                                    27, 29, 28,
-                                    27, 30, 29,
-                                    // Top triangles
-                                    37, 31, 32,
-                                    37, 32, 33,
-                                    37, 33, 34,
-                                    37, 34, 35,
-                                    37, 35, 36,
-                                    37, 36, 31,
-                                };
+                                // Bottom triangles
+                                1, 0, 6,
+                                2, 1, 6,
+                                3, 2, 6,
+                                4, 3, 6,
+                                5, 4, 6,
+                                0, 5, 6,
+                                // Back right triangles
+                                7, 9, 8,
+                                7, 10, 9,
+                                // Right triangles
+                                11, 13, 12,
+                                11, 14, 13,
+                                // Front right triangles
+                                15, 17, 16,
+                                15, 18, 17,
+                                // Front left triangles
+                                19, 21, 20,
+                                19, 22, 21,
+                                // Left triangles
+                                23, 25, 24,
+                                23, 26, 25,
+                                // Back left triangles
+                                27, 29, 28,
+                                27, 30, 29,
+                                // Top triangles
+                                37, 31, 32,
+                                37, 32, 33,
+                                37, 33, 34,
+                                37, 34, 35,
+                                37, 35, 36,
+                                37, 36, 31,
+                            };
 
                             Hexagon(parentCell, triangles);
 
                             xPos += sizeCell * (Mathf.Sqrt(3f) / 2f) + gutterGrid;
+                            column++;
                         }
                         if (rowEven)
                         {
@@ -320,17 +301,9 @@ public class GridSpawner : EditorWindow
                             zPos += sizeCell * 0.75f + gutterGrid;
                             rowEven = true;
                         }
+                        row++;
                     }
-                    xPos = 0f;
-                    zPos = 0f;
-                    numCell = 0;
-                    numPrefab = 0;
-                    cellAmount = 0;
-                    currentRandomCell = 0;
-                    for (int cell = 0; cell < cellAmount; cell++)
-                    {
-                        cellPrefab[cell] = false;
-                    }
+                    ResetValues();
                     break;
             }
         }
@@ -394,21 +367,7 @@ public class GridSpawner : EditorWindow
             new Vector3(xPos + sizeCell * 1f, heightCell * 0f, zPos + sizeCell * 0f), //23
         };
 
-        // Creating mesh
-        Mesh cell = new Mesh();
-
-        // Appointing mesh information to mesh
-        cell.vertices = vertices;
-        cell.triangles = triangles;
-        cell.RecalculateNormals();
-        cell.name = baseNameCell;
-
-        // Creating game object
-        GameObject cellObject = new GameObject(baseNameCell + numCell, typeof(MeshFilter), typeof(MeshRenderer));
-
-        cellObject.GetComponent<MeshFilter>().mesh = cell;
-
-        CreateMaterial(parent, cellObject);
+        CreateMesh(vertices, triangles, parent);
     }
 
     // Creates a triangle mesh with a height
@@ -598,17 +557,58 @@ public class GridSpawner : EditorWindow
         cellObject.transform.parent = parent.transform;
     }
 
+    void CreateMesh(Vector3[] vertices, int[] triangles, GameObject parent)
+    {
+        // Creating mesh
+        Mesh cell = new Mesh();
+
+        // Appointing mesh information to mesh
+        cell.vertices = vertices;
+        cell.triangles = triangles;
+        cell.RecalculateNormals();
+        cell.name = baseNameCell;
+
+        // Creating game object
+        GameObject cellObject = new GameObject(baseNameCell + numCell, typeof(MeshFilter), typeof(MeshRenderer));
+
+        cellObject.GetComponent<MeshFilter>().mesh = cell;
+
+        CreateMaterial(parent, cellObject);
+    }
+
+    void ResetValues()
+    {
+        xPos = 0f;
+        zPos = 0f;
+        numCell = 0;
+        numPrefab = 0;
+        cellAmount = 0f;
+        currentRandomCell = 0;
+
+        int cell = 0;
+        while (cell < cellAmount)
+        {
+            cellPrefab[cell] = false;
+            cell++;
+        }
+    }
+
+    void InstantiatePrefab(Vector3 prefabPos, GameObject parentPrefab)
+    {
+        GameObject prefabSpawned = (GameObject)Instantiate(prefabSource, prefabPos, Quaternion.identity);
+        prefabSpawned.name = "Prefab" + numPrefab;
+        prefabSpawned.transform.parent = parentPrefab.transform;
+        prefabSpawned.transform.localScale = new Vector3(sizePrefab, sizePrefab, sizePrefab);
+    }
+
     void RandomPick()
     {
-        for (int randomAmount = 0; randomAmount < columnsGrid * rowsGrid; randomAmount++)
+        int randomAmount = 0;
+        while (randomAmount < columnsGrid * rowsGrid)
         {
             if (currentRandomCell < cellAmount)
             {
-                placePrefab = Mathf.Round(Random.value * ((float)columnsGrid * (float)rowsGrid));
-                if (placePrefab > columnsGrid * rowsGrid - 1)
-                {
-                    placePrefab = columnsGrid * rowsGrid - 1;
-                }
+                placePrefab = Mathf.Min(Mathf.Round(Random.value * ((float)columnsGrid * (float)rowsGrid)), columnsGrid * rowsGrid - 1);
                 if (!cellPrefab[(int)placePrefab])
                 {
                     cellPrefab[(int)placePrefab] = true;
@@ -619,6 +619,7 @@ public class GridSpawner : EditorWindow
                     randomAmount--;
                 }
             }
+            randomAmount++;
         }
     }
 }
