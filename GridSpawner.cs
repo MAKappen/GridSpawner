@@ -23,17 +23,22 @@ public class GridSpawner : EditorWindow
     private ShapeGrid shapeSelected; //Stores which option is selected for the shape of every cell
     private float sizeCell; //Every cell will base its length and width on this value
     private float heightCell; //Every cell will take this value as its height, unless randomized (in case, this value will be the average height of all cells)
+    private bool heightRandomOptions; //Controls whether height randomisation options are enabled or not
+    private float heightRandomFactor; //Amount of randomisation in height (0 = no randomization, 100 = between twice the height and no height)
+
     private int rowsGrid; //Amount of rows present in the grid
     private int columnsGrid; //Amount of columns present in the grid
     private float gutterGrid; //Size of the gutter between the cells
+
     private Object prefabSource; //The prefab that will be placed randomly on the grid, unless amountRandom is set to 0
     private float sizePrefab; //Every prefab will scale its size based on this value
     private int amountRandom; //Percentage of prefabs placed relative to the amount of cells present in the grid
-    private bool prefabOptions; //Controls whether prefab spawning is enabled
+    private bool prefabOptions; //Controls whether prefab spawning is enabled or not
 
     private GameObject parentGrid; //The parent object that holds all the cells and prefabs
     private float xPos; //x position used to place current cell
     private float zPos; //z position used to place current cell
+    private float[] combinedHeight; // Height of cell combined with randomisation
     private bool triangleUp; //Decides whether a cell with a triangle shape is facing upwards or not to fit a triangle grid
     private bool rowEven; //Decides whether the current row with cells with a hexagon shape is an even number (2nd, 4th, 6th...row)
 
@@ -63,6 +68,17 @@ public class GridSpawner : EditorWindow
         shapeSelected = (ShapeGrid)EditorGUILayout.EnumPopup("Shape Cell ", shapeSelected);
         sizeCell = Mathf.Max(0, EditorGUILayout.FloatField("Size Cell", sizeCell));
         heightCell = Mathf.Max(0, EditorGUILayout.FloatField("Height Cell", heightCell));
+        heightRandomOptions = GUILayout.Toggle(heightRandomOptions, "Enable Height Randomisation");
+        GUI.enabled = heightRandomOptions;
+        heightRandomFactor = EditorGUILayout.Slider("Randomisation Factor", heightRandomFactor, 0f, 1f);
+        if (!heightRandomOptions)
+        {
+            heightRandomFactor = 0f;
+        }
+        GUI.enabled = true;
+
+        EditorGUILayout.Space();
+
         rowsGrid = Mathf.Max(0, EditorGUILayout.IntField("Rows", rowsGrid));
         columnsGrid = Mathf.Max(0, EditorGUILayout.IntField("Colums", columnsGrid));
         gutterGrid = Mathf.Max(0, EditorGUILayout.FloatField("Size Gutter", gutterGrid));
@@ -96,6 +112,7 @@ public class GridSpawner : EditorWindow
         if (GUILayout.Button("Replace Grid"))
         {
             DestroyImmediate(parentGrid);
+            ResetValues();
             CreateGrid();
         }
 
@@ -104,6 +121,7 @@ public class GridSpawner : EditorWindow
         // Creating create button
         if (GUILayout.Button("Generate New Grid"))
         {
+            ResetValues();
             CreateGrid();
         }
     }
@@ -127,6 +145,7 @@ public class GridSpawner : EditorWindow
         cellAmount = Mathf.Round((float)columnsGrid * (float)rowsGrid / 100 * (float)amountRandom);
 
         cellPrefab = new bool[columnsGrid * rowsGrid];
+        combinedHeight = new float[columnsGrid * rowsGrid];
 
         RandomPick();
 
@@ -143,13 +162,13 @@ public class GridSpawner : EditorWindow
                     column = 0;
                     while (column < columnsGrid)
                     {
+                        combinedHeight[numCell] = heightCell + heightCell * Random.Range(-heightRandomFactor, heightRandomFactor);
                         if (prefabOptions && prefabSource != null && cellPrefab[numCell])
                         {
                             numPrefab++;
-                            Vector3 prefabPos = new Vector3(xPos + sizeCell * 0.5f, heightCell * 1f, zPos + sizeCell * 0.5f);
+                            Vector3 prefabPos = new Vector3(xPos + sizeCell * 0.5f, combinedHeight[numCell], zPos + sizeCell * 0.5f);
                             InstantiatePrefab(prefabPos, parentPrefab);
                         }
-                        numCell++;
 
                         //Creating triangle information for mesh
                         int[] triangles = {
@@ -176,6 +195,7 @@ public class GridSpawner : EditorWindow
                         Square(parentCell, triangles);
 
                         xPos += sizeCell + gutterGrid;
+                        numCell++;
                         column++;
                     }
                     xPos = 0f;
@@ -193,23 +213,22 @@ public class GridSpawner : EditorWindow
                     column = 0;
                     while (column < columnsGrid)
                     {
+                        combinedHeight[numCell] = heightCell + heightCell * Random.Range(-heightRandomFactor, heightRandomFactor);
                         if (prefabOptions && prefabSource != null && cellPrefab[numCell])
                         {
                             if (triangleUp)
                             {
                                 numPrefab++;
-                                Vector3 prefabPos = new Vector3(xPos + sizeCell * 0.5f, heightCell * 1f, zPos + sizeCell * 0.33f);
+                                Vector3 prefabPos = new Vector3(xPos + sizeCell * 0.5f, combinedHeight[numCell], zPos + sizeCell * 0.33f);
                                 InstantiatePrefab(prefabPos, parentPrefab);
                             }
                             else
                             {
                                 numPrefab++;
-                                Vector3 prefabPos = new Vector3(xPos + sizeCell * 0.5f, heightCell * 1f, zPos + sizeCell * 0.67f);
-                                GameObject prefabSpawned = (GameObject)Instantiate(prefabSource, prefabPos, Quaternion.identity);
+                                Vector3 prefabPos = new Vector3(xPos + sizeCell * 0.5f, combinedHeight[numCell], zPos + sizeCell * 0.67f);
                                 InstantiatePrefab(prefabPos, parentPrefab);
                             }
                         }
-                        numCell++;
 
                         //Creating triangle information for mesh
                         if (triangleUp)
@@ -254,11 +273,13 @@ public class GridSpawner : EditorWindow
                         }
 
                         xPos += sizeCell / 2 + gutterGrid;
+                        numCell++;
+                        triangleUp = !triangleUp;
                         column++;
                     }
-                    triangleUp = !triangleUp;
                     xPos = 0f;
                     zPos += sizeCell + gutterGrid;
+                    triangleUp = !triangleUp;
                     row++;
                 }
                 ResetValues();
@@ -274,13 +295,13 @@ public class GridSpawner : EditorWindow
                     column = 0;
                     while (column < columnsGrid)
                     {
+                        combinedHeight[numCell] = heightCell + heightCell * Random.Range(-heightRandomFactor, heightRandomFactor);
                         if (prefabOptions && prefabSource != null && cellPrefab[numCell])
                         {
                             numPrefab++;
-                            Vector3 prefabPos = new Vector3(xPos + sizeCell * 0.5f, heightCell * 1f, zPos + sizeCell * 0.5f);
+                            Vector3 prefabPos = new Vector3(xPos + sizeCell * 0.5f, combinedHeight[numCell], zPos + sizeCell * 0.5f);
                             InstantiatePrefab(prefabPos, parentPrefab);
                         }
-                        numCell++;
 
                         //Creating triangle information for mesh
                         int[] triangles = {
@@ -321,6 +342,7 @@ public class GridSpawner : EditorWindow
                         Hexagon(parentCell, triangles);
 
                         xPos += sizeCell * (Mathf.Sqrt(3f) / 2f) + gutterGrid;
+                        numCell++;
                         column++;
                     }
                     if (rowEven)
@@ -348,40 +370,40 @@ public class GridSpawner : EditorWindow
         // Creating arrays for mesh information
         Vector3[] vertices = {
             // Bottom vertices
-            new Vector3(xPos + sizeCell * 1f, heightCell * 0f, zPos + sizeCell * 0f), //0
-            new Vector3(xPos + sizeCell * 0f, heightCell * 0f, zPos + sizeCell * 0f), //1
-            new Vector3(xPos + sizeCell * 0f, heightCell * 0f, zPos + sizeCell * 1f), //2
-            new Vector3(xPos + sizeCell * 1f, heightCell * 0f, zPos + sizeCell * 1f), //3
+            new Vector3(xPos + sizeCell * 1f, combinedHeight[numCell] * 0f, zPos + sizeCell * 0f), //0
+            new Vector3(xPos + sizeCell * 0f, combinedHeight[numCell] * 0f, zPos + sizeCell * 0f), //1
+            new Vector3(xPos + sizeCell * 0f, combinedHeight[numCell] * 0f, zPos + sizeCell * 1f), //2
+            new Vector3(xPos + sizeCell * 1f, combinedHeight[numCell] * 0f, zPos + sizeCell * 1f), //3
 
             // Back vertices
-            new Vector3(xPos + sizeCell * 1f, heightCell * 0f, zPos + sizeCell * 1f), //4
-            new Vector3(xPos + sizeCell * 0f, heightCell * 0f, zPos + sizeCell * 1f), //5
-            new Vector3(xPos + sizeCell * 0f, heightCell * 1f, zPos + sizeCell * 1f), //6
-            new Vector3(xPos + sizeCell * 1f, heightCell * 1f, zPos + sizeCell * 1f), //7
+            new Vector3(xPos + sizeCell * 1f, combinedHeight[numCell] * 0f, zPos + sizeCell * 1f), //4
+            new Vector3(xPos + sizeCell * 0f, combinedHeight[numCell] * 0f, zPos + sizeCell * 1f), //5
+            new Vector3(xPos + sizeCell * 0f, combinedHeight[numCell] * 1f, zPos + sizeCell * 1f), //6
+            new Vector3(xPos + sizeCell * 1f, combinedHeight[numCell] * 1f, zPos + sizeCell * 1f), //7
 
             // Right vertices
-            new Vector3(xPos + sizeCell * 0f, heightCell * 0f, zPos + sizeCell * 1f), //8
-            new Vector3(xPos + sizeCell * 0f, heightCell * 0f, zPos + sizeCell * 0f), //9
-            new Vector3(xPos + sizeCell * 0f, heightCell * 1f, zPos + sizeCell * 0f), //10
-            new Vector3(xPos + sizeCell * 0f, heightCell * 1f, zPos + sizeCell * 1f), //11
+            new Vector3(xPos + sizeCell * 0f, combinedHeight[numCell] * 0f, zPos + sizeCell * 1f), //8
+            new Vector3(xPos + sizeCell * 0f, combinedHeight[numCell] * 0f, zPos + sizeCell * 0f), //9
+            new Vector3(xPos + sizeCell * 0f, combinedHeight[numCell] * 1f, zPos + sizeCell * 0f), //10
+            new Vector3(xPos + sizeCell * 0f, combinedHeight[numCell] * 1f, zPos + sizeCell * 1f), //11
 
             // Left vertices
-            new Vector3(xPos + sizeCell * 1f, heightCell * 0f, zPos + sizeCell * 0f), //12
-            new Vector3(xPos + sizeCell * 1f, heightCell * 0f, zPos + sizeCell * 1f), //13
-            new Vector3(xPos + sizeCell * 1f, heightCell * 1f, zPos + sizeCell * 1f), //14
-            new Vector3(xPos + sizeCell * 1f, heightCell * 1f, zPos + sizeCell * 0f), //15
+            new Vector3(xPos + sizeCell * 1f, combinedHeight[numCell] * 0f, zPos + sizeCell * 0f), //12
+            new Vector3(xPos + sizeCell * 1f, combinedHeight[numCell] * 0f, zPos + sizeCell * 1f), //13
+            new Vector3(xPos + sizeCell * 1f, combinedHeight[numCell] * 1f, zPos + sizeCell * 1f), //14
+            new Vector3(xPos + sizeCell * 1f, combinedHeight[numCell] * 1f, zPos + sizeCell * 0f), //15
 
             // Top vertices
-            new Vector3(xPos + sizeCell * 0f, heightCell * 1f, zPos + sizeCell * 0f), //16
-            new Vector3(xPos + sizeCell * 1f, heightCell * 1f, zPos + sizeCell * 0f), //17
-            new Vector3(xPos + sizeCell * 1f, heightCell * 1f, zPos + sizeCell * 1f), //18
-            new Vector3(xPos + sizeCell * 0f, heightCell * 1f, zPos + sizeCell * 1f), //19
+            new Vector3(xPos + sizeCell * 0f, combinedHeight[numCell] * 1f, zPos + sizeCell * 0f), //16
+            new Vector3(xPos + sizeCell * 1f, combinedHeight[numCell] * 1f, zPos + sizeCell * 0f), //17
+            new Vector3(xPos + sizeCell * 1f, combinedHeight[numCell] * 1f, zPos + sizeCell * 1f), //18
+            new Vector3(xPos + sizeCell * 0f, combinedHeight[numCell] * 1f, zPos + sizeCell * 1f), //19
 
             // Front vertices
-            new Vector3(xPos + sizeCell * 1f, heightCell * 1f, zPos + sizeCell * 0f), //20
-            new Vector3(xPos + sizeCell * 0f, heightCell * 1f, zPos + sizeCell * 0f), //21
-            new Vector3(xPos + sizeCell * 0f, heightCell * 0f, zPos + sizeCell * 0f), //22
-            new Vector3(xPos + sizeCell * 1f, heightCell * 0f, zPos + sizeCell * 0f), //23
+            new Vector3(xPos + sizeCell * 1f, combinedHeight[numCell] * 1f, zPos + sizeCell * 0f), //20
+            new Vector3(xPos + sizeCell * 0f, combinedHeight[numCell] * 1f, zPos + sizeCell * 0f), //21
+            new Vector3(xPos + sizeCell * 0f, combinedHeight[numCell] * 0f, zPos + sizeCell * 0f), //22
+            new Vector3(xPos + sizeCell * 1f, combinedHeight[numCell] * 0f, zPos + sizeCell * 0f), //23
         };
         CreateMesh(vertices, triangles, parent);
     }
@@ -395,32 +417,32 @@ public class GridSpawner : EditorWindow
             // Creating arrays for mesh information
             Vector3[] vertices = {
                 // Bottom vertices
-                new Vector3(xPos + sizeCell * 1f, heightCell * 0f, zPos + sizeCell * 0f), //0
-                new Vector3(xPos + sizeCell * 0f, heightCell * 0f, zPos + sizeCell * 0f), //1
-                new Vector3(xPos + sizeCell * 0.5f, heightCell * 0f, zPos + sizeCell * 1f), //2
+                new Vector3(xPos + sizeCell * 1f, combinedHeight[numCell] * 0f, zPos + sizeCell * 0f), //0
+                new Vector3(xPos + sizeCell * 0f, combinedHeight[numCell] * 0f, zPos + sizeCell * 0f), //1
+                new Vector3(xPos + sizeCell * 0.5f, combinedHeight[numCell] * 0f, zPos + sizeCell * 1f), //2
 
                 // Right vertices
-                new Vector3(xPos + sizeCell * 0.5f, heightCell * 0f, zPos + sizeCell * 1f), //3
-                new Vector3(xPos + sizeCell * 0f, heightCell * 0f, zPos + sizeCell * 0f), //4
-                new Vector3(xPos + sizeCell * 0f, heightCell * 1f, zPos + sizeCell * 0f), //5
-                new Vector3(xPos + sizeCell * 0.5f, heightCell * 1f, zPos + sizeCell * 1f), //6
+                new Vector3(xPos + sizeCell * 0.5f, combinedHeight[numCell] * 0f, zPos + sizeCell * 1f), //3
+                new Vector3(xPos + sizeCell * 0f, combinedHeight[numCell] * 0f, zPos + sizeCell * 0f), //4
+                new Vector3(xPos + sizeCell * 0f, combinedHeight[numCell] * 1f, zPos + sizeCell * 0f), //5
+                new Vector3(xPos + sizeCell * 0.5f, combinedHeight[numCell] * 1f, zPos + sizeCell * 1f), //6
 
                 // Left vertices
-                new Vector3(xPos + sizeCell * 1f, heightCell * 0f, zPos + sizeCell * 0f), //7
-                new Vector3(xPos + sizeCell * 0.5f, heightCell * 0f, zPos + sizeCell * 1f), //8
-                new Vector3(xPos + sizeCell * 0.5f, heightCell * 1f, zPos + sizeCell * 1f), //9
-                new Vector3(xPos + sizeCell * 1f, heightCell * 1f, zPos + sizeCell * 0f), //10
+                new Vector3(xPos + sizeCell * 1f, combinedHeight[numCell] * 0f, zPos + sizeCell * 0f), //7
+                new Vector3(xPos + sizeCell * 0.5f, combinedHeight[numCell] * 0f, zPos + sizeCell * 1f), //8
+                new Vector3(xPos + sizeCell * 0.5f, combinedHeight[numCell] * 1f, zPos + sizeCell * 1f), //9
+                new Vector3(xPos + sizeCell * 1f, combinedHeight[numCell] * 1f, zPos + sizeCell * 0f), //10
 
                 // Top vertices
-                new Vector3(xPos + sizeCell * 0f, heightCell * 1f, zPos + sizeCell * 0f), //11
-                new Vector3(xPos + sizeCell * 1f, heightCell * 1f, zPos + sizeCell * 0f), //12
-                new Vector3(xPos + sizeCell * 0.5f, heightCell * 1f, zPos + sizeCell * 1f), //13
+                new Vector3(xPos + sizeCell * 0f, combinedHeight[numCell] * 1f, zPos + sizeCell * 0f), //11
+                new Vector3(xPos + sizeCell * 1f, combinedHeight[numCell] * 1f, zPos + sizeCell * 0f), //12
+                new Vector3(xPos + sizeCell * 0.5f, combinedHeight[numCell] * 1f, zPos + sizeCell * 1f), //13
 
                 // Front vertices
-                new Vector3(xPos + sizeCell * 1f, heightCell * 1f, zPos + sizeCell * 0f), //14
-                new Vector3(xPos + sizeCell * 0f, heightCell * 1f, zPos + sizeCell * 0f), //15
-                new Vector3(xPos + sizeCell * 0f, heightCell * 0f, zPos + sizeCell * 0f), //16
-                new Vector3(xPos + sizeCell * 1f, heightCell * 0f, zPos + sizeCell * 0f), //17
+                new Vector3(xPos + sizeCell * 1f, combinedHeight[numCell] * 1f, zPos + sizeCell * 0f), //14
+                new Vector3(xPos + sizeCell * 0f, combinedHeight[numCell] * 1f, zPos + sizeCell * 0f), //15
+                new Vector3(xPos + sizeCell * 0f, combinedHeight[numCell] * 0f, zPos + sizeCell * 0f), //16
+                new Vector3(xPos + sizeCell * 1f, combinedHeight[numCell] * 0f, zPos + sizeCell * 0f), //17
             };
             CreateMesh(vertices, triangles, parent);
         }
@@ -429,32 +451,32 @@ public class GridSpawner : EditorWindow
             // Creating arrays for mesh information
             Vector3[] vertices = {
                 // Bottom vertices
-                new Vector3(xPos + sizeCell * 0.5f, heightCell * 0f, zPos + sizeCell * 0f), //0
-                new Vector3(xPos + sizeCell * 1f, heightCell * 0f, zPos + sizeCell * 1f), //1
-                new Vector3(xPos + sizeCell * 0f, heightCell * 0f, zPos + sizeCell * 1f), //2
+                new Vector3(xPos + sizeCell * 0.5f, combinedHeight[numCell] * 0f, zPos + sizeCell * 0f), //0
+                new Vector3(xPos + sizeCell * 1f, combinedHeight[numCell] * 0f, zPos + sizeCell * 1f), //1
+                new Vector3(xPos + sizeCell * 0f, combinedHeight[numCell] * 0f, zPos + sizeCell * 1f), //2
 
                 // Back vertices
-                new Vector3(xPos + sizeCell * 1f, heightCell * 0f, zPos + sizeCell * 1f), //3
-                new Vector3(xPos + sizeCell * 0f, heightCell * 0f, zPos + sizeCell * 1f), //4
-                new Vector3(xPos + sizeCell * 1f, heightCell * 1f, zPos + sizeCell * 1f), //5
-                new Vector3(xPos + sizeCell * 0f, heightCell * 1f, zPos + sizeCell * 1f), //6
+                new Vector3(xPos + sizeCell * 1f, combinedHeight[numCell] * 0f, zPos + sizeCell * 1f), //3
+                new Vector3(xPos + sizeCell * 0f, combinedHeight[numCell] * 0f, zPos + sizeCell * 1f), //4
+                new Vector3(xPos + sizeCell * 1f, combinedHeight[numCell] * 1f, zPos + sizeCell * 1f), //5
+                new Vector3(xPos + sizeCell * 0f, combinedHeight[numCell] * 1f, zPos + sizeCell * 1f), //6
 
                 // Right vertices
-                new Vector3(xPos + sizeCell * 0f, heightCell * 0f, zPos + sizeCell * 1f), //7
-                new Vector3(xPos + sizeCell * 0.5f, heightCell * 0f, zPos + sizeCell * 0f), //8
-                new Vector3(xPos + sizeCell * 0.5f, heightCell * 1f, zPos + sizeCell * 0f), //9
-                new Vector3(xPos + sizeCell * 0f, heightCell * 1f, zPos + sizeCell * 1f), //10
+                new Vector3(xPos + sizeCell * 0f, combinedHeight[numCell] * 0f, zPos + sizeCell * 1f), //7
+                new Vector3(xPos + sizeCell * 0.5f, combinedHeight[numCell] * 0f, zPos + sizeCell * 0f), //8
+                new Vector3(xPos + sizeCell * 0.5f, combinedHeight[numCell] * 1f, zPos + sizeCell * 0f), //9
+                new Vector3(xPos + sizeCell * 0f, combinedHeight[numCell] * 1f, zPos + sizeCell * 1f), //10
 
                 // Left vertices
-                new Vector3(xPos + sizeCell * 0.5f, heightCell * 0f, zPos + sizeCell * 0f), //11
-                new Vector3(xPos + sizeCell * 1f, heightCell * 0f, zPos + sizeCell * 1f), //12
-                new Vector3(xPos + sizeCell * 1f, heightCell * 1f, zPos + sizeCell * 1f), //13
-                new Vector3(xPos + sizeCell * 0.5f, heightCell * 1f, zPos + sizeCell * 0f), //14
+                new Vector3(xPos + sizeCell * 0.5f, combinedHeight[numCell] * 0f, zPos + sizeCell * 0f), //11
+                new Vector3(xPos + sizeCell * 1f, combinedHeight[numCell] * 0f, zPos + sizeCell * 1f), //12
+                new Vector3(xPos + sizeCell * 1f, combinedHeight[numCell] * 1f, zPos + sizeCell * 1f), //13
+                new Vector3(xPos + sizeCell * 0.5f, combinedHeight[numCell] * 1f, zPos + sizeCell * 0f), //14
 
                 // Top vertices
-                new Vector3(xPos + sizeCell * 0.5f, heightCell * 1f, zPos + sizeCell * 0f), //15
-                new Vector3(xPos + sizeCell * 1f, heightCell * 1f, zPos + sizeCell * 1f), //16
-                new Vector3(xPos + sizeCell * 0f, heightCell * 1f, zPos + sizeCell * 1f), //17
+                new Vector3(xPos + sizeCell * 0.5f, combinedHeight[numCell] * 1f, zPos + sizeCell * 0f), //15
+                new Vector3(xPos + sizeCell * 1f, combinedHeight[numCell] * 1f, zPos + sizeCell * 1f), //16
+                new Vector3(xPos + sizeCell * 0f, combinedHeight[numCell] * 1f, zPos + sizeCell * 1f), //17
             };
             CreateMesh(vertices, triangles, parent);
         }
@@ -466,58 +488,58 @@ public class GridSpawner : EditorWindow
         // Creating arrays for mesh information
         Vector3[] vertices = {
         // Bottom vertices
-        new Vector3(xPos + sizeCell * 0.5f, heightCell * 0f, zPos + sizeCell * 1f), //0
-        new Vector3(xPos + sizeCell * (0.5f + Mathf.Sqrt(3f) / 4f), heightCell * 0f, zPos + sizeCell * 0.75f), //1
-        new Vector3(xPos + sizeCell * (0.5f + Mathf.Sqrt(3f) / 4f), heightCell * 0f, zPos + sizeCell * 0.25f), //2
-        new Vector3(xPos + sizeCell * 0.5f, heightCell * 0f, zPos + sizeCell * 0f), //3
-        new Vector3(xPos + sizeCell * (0.5f - Mathf.Sqrt(3f) / 4f), heightCell * 0f, zPos + sizeCell * 0.25f), //4
-        new Vector3(xPos + sizeCell * (0.5f - Mathf.Sqrt(3f) / 4f), heightCell * 0f, zPos + sizeCell * 0.75f), //5
-        new Vector3(xPos + sizeCell * 0.5f, heightCell * 0f, zPos + sizeCell * 0.5f), //6
+        new Vector3(xPos + sizeCell * 0.5f, combinedHeight[numCell] * 0f, zPos + sizeCell * 1f), //0
+        new Vector3(xPos + sizeCell * (0.5f + Mathf.Sqrt(3f) / 4f), combinedHeight[numCell] * 0f, zPos + sizeCell * 0.75f), //1
+        new Vector3(xPos + sizeCell * (0.5f + Mathf.Sqrt(3f) / 4f), combinedHeight[numCell] * 0f, zPos + sizeCell * 0.25f), //2
+        new Vector3(xPos + sizeCell * 0.5f, combinedHeight[numCell] * 0f, zPos + sizeCell * 0f), //3
+        new Vector3(xPos + sizeCell * (0.5f - Mathf.Sqrt(3f) / 4f), combinedHeight[numCell] * 0f, zPos + sizeCell * 0.25f), //4
+        new Vector3(xPos + sizeCell * (0.5f - Mathf.Sqrt(3f) / 4f), combinedHeight[numCell] * 0f, zPos + sizeCell * 0.75f), //5
+        new Vector3(xPos + sizeCell * 0.5f, combinedHeight[numCell] * 0f, zPos + sizeCell * 0.5f), //6
         
         // Back right vertices
-        new Vector3(xPos + sizeCell * 0.5f, heightCell * 0f, zPos + sizeCell * 1f), //7
-        new Vector3(xPos + sizeCell * (0.5f - Mathf.Sqrt(3f) / 4f), heightCell * 0f, zPos + sizeCell * 0.75f), //8
-        new Vector3(xPos + sizeCell * (0.5f - Mathf.Sqrt(3f) / 4f), heightCell * 1f, zPos + sizeCell * 0.75f), //9
-        new Vector3(xPos + sizeCell * 0.5f, heightCell * 1f, zPos + sizeCell * 1f), //10
+        new Vector3(xPos + sizeCell * 0.5f, combinedHeight[numCell] * 0f, zPos + sizeCell * 1f), //7
+        new Vector3(xPos + sizeCell * (0.5f - Mathf.Sqrt(3f) / 4f), combinedHeight[numCell] * 0f, zPos + sizeCell * 0.75f), //8
+        new Vector3(xPos + sizeCell * (0.5f - Mathf.Sqrt(3f) / 4f), combinedHeight[numCell] * 1f, zPos + sizeCell * 0.75f), //9
+        new Vector3(xPos + sizeCell * 0.5f, combinedHeight[numCell] * 1f, zPos + sizeCell * 1f), //10
 
         // Right vertices
-        new Vector3(xPos + sizeCell * (0.5f - Mathf.Sqrt(3f) / 4f), heightCell * 0f, zPos + sizeCell * 0.75f), //11
-        new Vector3(xPos + sizeCell * (0.5f - Mathf.Sqrt(3f) / 4f), heightCell * 0f, zPos + sizeCell * 0.25f), //12
-        new Vector3(xPos + sizeCell * (0.5f - Mathf.Sqrt(3f) / 4f), heightCell * 1f, zPos + sizeCell * 0.25f), //13
-        new Vector3(xPos + sizeCell * (0.5f - Mathf.Sqrt(3f) / 4f), heightCell * 1f, zPos + sizeCell * 0.75f), //14
+        new Vector3(xPos + sizeCell * (0.5f - Mathf.Sqrt(3f) / 4f), combinedHeight[numCell] * 0f, zPos + sizeCell * 0.75f), //11
+        new Vector3(xPos + sizeCell * (0.5f - Mathf.Sqrt(3f) / 4f), combinedHeight[numCell] * 0f, zPos + sizeCell * 0.25f), //12
+        new Vector3(xPos + sizeCell * (0.5f - Mathf.Sqrt(3f) / 4f), combinedHeight[numCell] * 1f, zPos + sizeCell * 0.25f), //13
+        new Vector3(xPos + sizeCell * (0.5f - Mathf.Sqrt(3f) / 4f), combinedHeight[numCell] * 1f, zPos + sizeCell * 0.75f), //14
 
         // Front right vertices
-        new Vector3(xPos + sizeCell * (0.5f - Mathf.Sqrt(3f) / 4f), heightCell * 0f, zPos + sizeCell * 0.25f), //15
-        new Vector3(xPos + sizeCell * 0.5f, heightCell * 0f, zPos + sizeCell * 0f), //16
-        new Vector3(xPos + sizeCell * 0.5f, heightCell * 1f, zPos + sizeCell * 0f), //17
-        new Vector3(xPos + sizeCell * (0.5f - Mathf.Sqrt(3f) / 4f), heightCell * 1f, zPos + sizeCell * 0.25f), //18
+        new Vector3(xPos + sizeCell * (0.5f - Mathf.Sqrt(3f) / 4f), combinedHeight[numCell] * 0f, zPos + sizeCell * 0.25f), //15
+        new Vector3(xPos + sizeCell * 0.5f, combinedHeight[numCell] * 0f, zPos + sizeCell * 0f), //16
+        new Vector3(xPos + sizeCell * 0.5f, combinedHeight[numCell] * 1f, zPos + sizeCell * 0f), //17
+        new Vector3(xPos + sizeCell * (0.5f - Mathf.Sqrt(3f) / 4f), combinedHeight[numCell] * 1f, zPos + sizeCell * 0.25f), //18
 
         // Front left vertices
-        new Vector3(xPos + sizeCell * 0.5f, heightCell * 0f, zPos + sizeCell * 0f), //19
-        new Vector3(xPos + sizeCell * (0.5f + Mathf.Sqrt(3f) / 4f), heightCell * 0f, zPos + sizeCell * 0.25f), //20
-        new Vector3(xPos + sizeCell * (0.5f + Mathf.Sqrt(3f) / 4f), heightCell * 1f, zPos + sizeCell * 0.25f), //21
-        new Vector3(xPos + sizeCell * 0.5f, heightCell * 1f, zPos + sizeCell * 0f), //22
+        new Vector3(xPos + sizeCell * 0.5f, combinedHeight[numCell] * 0f, zPos + sizeCell * 0f), //19
+        new Vector3(xPos + sizeCell * (0.5f + Mathf.Sqrt(3f) / 4f), combinedHeight[numCell] * 0f, zPos + sizeCell * 0.25f), //20
+        new Vector3(xPos + sizeCell * (0.5f + Mathf.Sqrt(3f) / 4f), combinedHeight[numCell] * 1f, zPos + sizeCell * 0.25f), //21
+        new Vector3(xPos + sizeCell * 0.5f, combinedHeight[numCell] * 1f, zPos + sizeCell * 0f), //22
 
         // Left vertices
-        new Vector3(xPos + sizeCell * (0.5f + Mathf.Sqrt(3f) / 4f), heightCell * 0f, zPos + sizeCell * 0.25f), //23
-        new Vector3(xPos + sizeCell * (0.5f + Mathf.Sqrt(3f) / 4f), heightCell * 0f, zPos + sizeCell * 0.75f), //24
-        new Vector3(xPos + sizeCell * (0.5f + Mathf.Sqrt(3f) / 4f), heightCell * 1f, zPos + sizeCell * 0.75f), //25
-        new Vector3(xPos + sizeCell * (0.5f + Mathf.Sqrt(3f) / 4f), heightCell * 1f, zPos + sizeCell * 0.25f), //26
+        new Vector3(xPos + sizeCell * (0.5f + Mathf.Sqrt(3f) / 4f), combinedHeight[numCell] * 0f, zPos + sizeCell * 0.25f), //23
+        new Vector3(xPos + sizeCell * (0.5f + Mathf.Sqrt(3f) / 4f), combinedHeight[numCell] * 0f, zPos + sizeCell * 0.75f), //24
+        new Vector3(xPos + sizeCell * (0.5f + Mathf.Sqrt(3f) / 4f), combinedHeight[numCell] * 1f, zPos + sizeCell * 0.75f), //25
+        new Vector3(xPos + sizeCell * (0.5f + Mathf.Sqrt(3f) / 4f), combinedHeight[numCell] * 1f, zPos + sizeCell * 0.25f), //26
 
         // Back left vertices
-        new Vector3(xPos + sizeCell * (0.5f + Mathf.Sqrt(3f) / 4f), heightCell * 0f, zPos + sizeCell * 0.75f), //27
-        new Vector3(xPos + sizeCell * 0.5f, heightCell * 0f, zPos + sizeCell * 1f), //28
-        new Vector3(xPos + sizeCell * 0.5f, heightCell * 1f, zPos + sizeCell * 1f), //29
-        new Vector3(xPos + sizeCell * (0.5f + Mathf.Sqrt(3f) / 4f), heightCell * 1f, zPos + sizeCell * 0.75f), //30
+        new Vector3(xPos + sizeCell * (0.5f + Mathf.Sqrt(3f) / 4f), combinedHeight[numCell] * 0f, zPos + sizeCell * 0.75f), //27
+        new Vector3(xPos + sizeCell * 0.5f, combinedHeight[numCell] * 0f, zPos + sizeCell * 1f), //28
+        new Vector3(xPos + sizeCell * 0.5f, combinedHeight[numCell] * 1f, zPos + sizeCell * 1f), //29
+        new Vector3(xPos + sizeCell * (0.5f + Mathf.Sqrt(3f) / 4f), combinedHeight[numCell] * 1f, zPos + sizeCell * 0.75f), //30
 
         // Bottom vertices
-        new Vector3(xPos + sizeCell * 0.5f, heightCell * 1f, zPos + sizeCell * 1f), //31
-        new Vector3(xPos + sizeCell * (0.5f + Mathf.Sqrt(3f) / 4f), heightCell * 1f, zPos + sizeCell * 0.75f), //32
-        new Vector3(xPos + sizeCell * (0.5f + Mathf.Sqrt(3f) / 4f), heightCell * 1f, zPos + sizeCell * 0.25f), //33
-        new Vector3(xPos + sizeCell * 0.5f, heightCell * 1f, zPos + sizeCell * 0f), //34
-        new Vector3(xPos + sizeCell * (0.5f - Mathf.Sqrt(3f) / 4f), heightCell * 1f, zPos + sizeCell * 0.25f), //35
-        new Vector3(xPos + sizeCell * (0.5f - Mathf.Sqrt(3f) / 4f), heightCell * 1f, zPos + sizeCell * 0.75f), //36
-        new Vector3(xPos + sizeCell * 0.5f, heightCell * 1f, zPos + sizeCell * 0.5f), //37
+        new Vector3(xPos + sizeCell * 0.5f, combinedHeight[numCell] * 1f, zPos + sizeCell * 1f), //31
+        new Vector3(xPos + sizeCell * (0.5f + Mathf.Sqrt(3f) / 4f), combinedHeight[numCell] * 1f, zPos + sizeCell * 0.75f), //32
+        new Vector3(xPos + sizeCell * (0.5f + Mathf.Sqrt(3f) / 4f), combinedHeight[numCell] * 1f, zPos + sizeCell * 0.25f), //33
+        new Vector3(xPos + sizeCell * 0.5f, combinedHeight[numCell] * 1f, zPos + sizeCell * 0f), //34
+        new Vector3(xPos + sizeCell * (0.5f - Mathf.Sqrt(3f) / 4f), combinedHeight[numCell] * 1f, zPos + sizeCell * 0.25f), //35
+        new Vector3(xPos + sizeCell * (0.5f - Mathf.Sqrt(3f) / 4f), combinedHeight[numCell] * 1f, zPos + sizeCell * 0.75f), //36
+        new Vector3(xPos + sizeCell * 0.5f, combinedHeight[numCell] * 1f, zPos + sizeCell * 0.5f), //37
         };
         CreateMesh(vertices, triangles, parent);
     }
