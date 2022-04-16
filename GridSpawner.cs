@@ -16,6 +16,19 @@ public enum MatGrid
     HDRP,
 }
 
+/* Class: GridSpawner
+ * 
+ * Implements the functionalities of the tool Grid Spawner:
+ * 
+ *  - Implementing GUI elements
+ *  - Creating a 2D grid in a 3D environment using values inputted by the user
+ *  - Creating meshes to represent cells in one of three shapes (square, triangle, hexagon)
+ *  - Calculating the height of cells based on average height and randomisation factor inputted by user
+ *  - Placing prefabs randomly on cells based on values inputted by user
+ *  - Replacing most recently created grid or creating a new grid
+ * 
+ */
+
 public class GridSpawner : EditorWindow
 {
     private string baseNameCell; //Every cell object will be named with this string input
@@ -50,6 +63,7 @@ public class GridSpawner : EditorWindow
     private float placePrefab; //Random number that decides which cell the tool will try to place a prefab
     private bool[] cellPrefab; //Stores which cells have a prefab on them already
 
+    // Creates window
     [MenuItem("Window/Grid Spawner")]
     static void OpenWindow()
     {
@@ -59,6 +73,7 @@ public class GridSpawner : EditorWindow
         window.Show();
     }
 
+    // Implements GUI elements
     void OnGUI()
     {
         // Creating fields for the grid settings
@@ -100,7 +115,7 @@ public class GridSpawner : EditorWindow
 
         EditorGUILayout.Space();
 
-        //Disable "Replace Grid" button if no previous grid exists
+        // Disable "Replace Grid" button if no previous grid exists
         GUI.enabled = false;
 
         if (parentGrid != null)
@@ -126,6 +141,7 @@ public class GridSpawner : EditorWindow
         }
     }
 
+    // Forms 2D grid in a 3D environment
     void CreateGrid()
     {
         // Creating parent objects
@@ -157,6 +173,30 @@ public class GridSpawner : EditorWindow
             // Square selected
             case ShapeGrid.Square:
                 row = 0;
+
+
+                //Creating triangle information for mesh once
+                int[] squareTriangles = {
+                    // Bottom triangles
+                    2, 1, 0,
+                    3, 2, 0,
+                    // Back triangles
+                    6, 5, 4,
+                    7, 6, 4,
+                    // Right triangles
+                    10, 9, 8,
+                    11, 10, 8,
+                    // Left triangles
+                    14, 13, 12,
+                    15, 14, 12,
+                    // Top triangles
+                    18, 17, 16,
+                    19, 18, 16,
+                    // Front triangles
+                    22, 21, 20,
+                    23, 22, 20,
+                };
+
                 while (row < rowsGrid)
                 {
                     column = 0;
@@ -170,29 +210,7 @@ public class GridSpawner : EditorWindow
                             InstantiatePrefab(prefabPos, parentPrefab);
                         }
 
-                        //Creating triangle information for mesh
-                        int[] triangles = {
-                            // Bottom triangles
-                            2, 1, 0,
-                            3, 2, 0,
-                            // Back triangles
-                            6, 5, 4,
-                            7, 6, 4,
-                            // Right triangles
-                            10, 9, 8,
-                            11, 10, 8,
-                            // Left triangles
-                            14, 13, 12,
-                            15, 14, 12,
-                            // Top triangles
-                            18, 17, 16,
-                            19, 18, 16,
-                            // Front triangles
-                            22, 21, 20,
-                            23, 22, 20,
-                        };
-
-                        Square(parentCell, triangles);
+                        Square(parentCell, squareTriangles);
 
                         xPos += sizeCell + gutterGrid;
                         numCell++;
@@ -208,6 +226,46 @@ public class GridSpawner : EditorWindow
             // Triangle selected
             case ShapeGrid.Triangle:
                 row = 0;
+
+                //Creating triangle information for mesh once
+                int[] triangleTriangles;
+                if (triangleUp)
+                {
+                    triangleTriangles = new int[] {
+                        // Bottom triangles
+                        2, 1, 0,
+                        // Right triangles
+                        5, 4, 3,
+                        6, 5, 3,
+                        // Left triangles
+                        9, 8, 7,
+                        10, 9, 7,
+                        // Top triangles
+                        13, 12, 11,
+                        // Front triangles
+                        16, 15, 14,
+                        17, 16, 14,
+                    };
+                }
+                else
+                {
+                    triangleTriangles = new int[] {
+                        // Bottom triangles
+                        2, 1, 0,
+                        // Back triangles
+                        5, 4, 3,
+                        6, 4, 5,
+                        // Right triangles
+                        9, 8, 7,
+                        10, 9, 7,
+                        // Left triangles
+                        13, 12, 11,
+                        14, 13, 11,
+                        // Top triangles
+                        17, 16, 15,
+                    };
+                }
+
                 while (row < rowsGrid)
                 {
                     column = 0;
@@ -230,47 +288,7 @@ public class GridSpawner : EditorWindow
                             }
                         }
 
-                        //Creating triangle information for mesh
-                        if (triangleUp)
-                        {
-                            int[] triangles = {
-                                // Bottom triangles
-                                2, 1, 0,
-                                // Right triangles
-                                5, 4, 3,
-                                6, 5, 3,
-                                // Left triangles
-                                9, 8, 7,
-                                10, 9, 7,
-                                // Top triangles
-                                13, 12, 11,
-                                // Front triangles
-                                16, 15, 14,
-                                17, 16, 14,
-                            };
-
-                            Triangle(parentCell, triangles);
-                        }
-                        else
-                        {
-                            int[] triangles = {
-                                // Bottom triangles
-                                2, 1, 0,
-                                // Back triangles
-                                5, 4, 3,
-                                6, 4, 5,
-                                // Right triangles
-                                9, 8, 7,
-                                10, 9, 7,
-                                // Left triangles
-                                13, 12, 11,
-                                14, 13, 11,
-                                // Top triangles
-                                17, 16, 15,
-                            };
-
-                            Triangle(parentCell, triangles);
-                        }
+                        Triangle(parentCell, triangleTriangles);
 
                         xPos += sizeCell / 2 + gutterGrid;
                         numCell++;
@@ -290,6 +308,43 @@ public class GridSpawner : EditorWindow
             case ShapeGrid.Hexagon:
                 xPos = -sizeCell * (0.5f - Mathf.Sqrt(3f) / 4f);
                 row = 0;
+
+                //Creating triangle information once for mesh
+                int[] hexagonTriangles = {
+                    // Bottom triangles
+                    1, 0, 6,
+                    2, 1, 6,
+                    3, 2, 6,
+                    4, 3, 6,
+                    5, 4, 6,
+                    0, 5, 6,
+                    // Back right triangles
+                    7, 9, 8,
+                    7, 10, 9,
+                    // Right triangles
+                    11, 13, 12,
+                    11, 14, 13,
+                    // Front right triangles
+                    15, 17, 16,
+                    15, 18, 17,
+                    // Front left triangles
+                    19, 21, 20,
+                    19, 22, 21,
+                    // Left triangles
+                    23, 25, 24,
+                    23, 26, 25,
+                    // Back left triangles
+                    27, 29, 28,
+                    27, 30, 29,
+                    // Top triangles
+                    37, 31, 32,
+                    37, 32, 33,
+                    37, 33, 34,
+                    37, 34, 35,
+                    37, 35, 36,
+                    37, 36, 31,
+                };
+
                 while (row < rowsGrid)
                 {
                     column = 0;
@@ -303,43 +358,7 @@ public class GridSpawner : EditorWindow
                             InstantiatePrefab(prefabPos, parentPrefab);
                         }
 
-                        //Creating triangle information for mesh
-                        int[] triangles = {
-                            // Bottom triangles
-                            1, 0, 6,
-                            2, 1, 6,
-                            3, 2, 6,
-                            4, 3, 6,
-                            5, 4, 6,
-                            0, 5, 6,
-                            // Back right triangles
-                            7, 9, 8,
-                            7, 10, 9,
-                            // Right triangles
-                            11, 13, 12,
-                            11, 14, 13,
-                            // Front right triangles
-                            15, 17, 16,
-                            15, 18, 17,
-                            // Front left triangles
-                            19, 21, 20,
-                            19, 22, 21,
-                            // Left triangles
-                            23, 25, 24,
-                            23, 26, 25,
-                            // Back left triangles
-                            27, 29, 28,
-                            27, 30, 29,
-                            // Top triangles
-                            37, 31, 32,
-                            37, 32, 33,
-                            37, 33, 34,
-                            37, 34, 35,
-                            37, 35, 36,
-                            37, 36, 31,
-                        };
-
-                        Hexagon(parentCell, triangles);
+                        Hexagon(parentCell, hexagonTriangles);
 
                         xPos += sizeCell * (Mathf.Sqrt(3f) / 2f) + gutterGrid;
                         numCell++;
@@ -364,7 +383,7 @@ public class GridSpawner : EditorWindow
         }
     }
 
-    // Creates a square mesh with a height (also considered a cube)
+    // Creates a square cell vertex information
     void Square(GameObject parent, int[] triangles)
     {
         // Creating arrays for mesh information
@@ -408,7 +427,7 @@ public class GridSpawner : EditorWindow
         CreateMesh(vertices, triangles, parent);
     }
 
-    // Creates a triangle mesh with a height
+    // Creates a triangle cell vertex information
     void Triangle(GameObject parent, int[] triangles)
     {
         // Checking which way the triangle is facing
@@ -482,7 +501,7 @@ public class GridSpawner : EditorWindow
         }
     }
 
-    // Creates a hexagon mesh with a height
+    // Creates a hexagon vertex information
     void Hexagon(GameObject parent, int[] triangles)
     {
         // Creating arrays for mesh information
@@ -544,6 +563,7 @@ public class GridSpawner : EditorWindow
         CreateMesh(vertices, triangles, parent);
     }
 
+    // Creates cell mesh using vertex and triangle information, then gives it a empty parent object (for grouping purposes)
     void CreateMesh(Vector3[] vertices, int[] triangles, GameObject parent)
     {
         // Creating mesh
@@ -564,6 +584,7 @@ public class GridSpawner : EditorWindow
         cellObject.transform.parent = parent.transform;
     }
 
+    // Creates a material for the cell meshes to use
     void CreateMaterial(GameObject cellObject)
     {
         // Checks which shader is selected, and then creates a material
@@ -579,6 +600,7 @@ public class GridSpawner : EditorWindow
         }
     }
 
+    // Resets calculation values to avoid issues such as out of bounds arrays, improper placement of cells, or improper randomisation of prefabs and cell height
     void ResetValues()
     {
         xPos = 0f;
@@ -596,6 +618,7 @@ public class GridSpawner : EditorWindow
         }
     }
 
+    // Instantiates prefab on given location, and then gives it an empty parent object (for grouping purposes)
     void InstantiatePrefab(Vector3 prefabPos, GameObject parentPrefab)
     {
         GameObject prefabSpawned = (GameObject)Instantiate(prefabSource, prefabPos, Quaternion.identity);
@@ -604,6 +627,7 @@ public class GridSpawner : EditorWindow
         prefabSpawned.transform.localScale = new Vector3(sizePrefab, sizePrefab, sizePrefab);
     }
 
+    // Randomly picks cells for prefabs to be placed on
     void RandomPick()
     {
         int randomAmount = 0;
