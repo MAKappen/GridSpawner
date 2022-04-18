@@ -228,43 +228,36 @@ public class GridSpawner : EditorWindow
                 row = 0;
 
                 //Creating triangle information for mesh once
-                int[] triangleTriangles;
-                if (triangleUp)
-                {
-                    triangleTriangles = new int[] {
-                        // Bottom triangles
-                        2, 1, 0,
-                        // Right triangles
-                        5, 4, 3,
-                        6, 5, 3,
-                        // Left triangles
-                        9, 8, 7,
-                        10, 9, 7,
-                        // Top triangles
-                        13, 12, 11,
-                        // Front triangles
-                        16, 15, 14,
-                        17, 16, 14,
-                    };
-                }
-                else
-                {
-                    triangleTriangles = new int[] {
-                        // Bottom triangles
-                        2, 1, 0,
-                        // Back triangles
-                        5, 4, 3,
-                        6, 4, 5,
-                        // Right triangles
-                        9, 8, 7,
-                        10, 9, 7,
-                        // Left triangles
-                        13, 12, 11,
-                        14, 13, 11,
-                        // Top triangles
-                        17, 16, 15,
-                    };
-                }
+                int[] triangleUpTriangles = {
+                    // Bottom triangles
+                    2, 1, 0,
+                    // Right triangles
+                    5, 4, 3,
+                    6, 5, 3,
+                    // Left triangles
+                    9, 8, 7,
+                    10, 9, 7,
+                    // Top triangles
+                    13, 12, 11,
+                    // Front triangles
+                    16, 15, 14,
+                    17, 16, 14,
+                };
+                int[] triangleDownTriangles = {
+                    // Bottom triangles
+                    2, 0, 1,
+                    // Back triangles
+                    5, 4, 3,
+                    6, 4, 5,
+                    // Right triangles
+                    9, 8, 7,
+                    10, 9, 7,
+                    // Left triangles
+                    13, 12, 11,
+                    14, 13, 11,
+                    // Top triangles
+                    17, 16, 15,
+                };
 
                 while (row < rowsGrid)
                 {
@@ -272,23 +265,26 @@ public class GridSpawner : EditorWindow
                     while (column < columnsGrid)
                     {
                         combinedHeight[numCell] = heightCell + heightCell * Random.Range(-heightRandomFactor, heightRandomFactor);
-                        if (prefabOptions && prefabSource != null && cellPrefab[numCell])
+                        if (triangleUp)
                         {
-                            if (triangleUp)
+                            if (prefabOptions && prefabSource != null && cellPrefab[numCell])
                             {
                                 numPrefab++;
                                 Vector3 prefabPos = new Vector3(xPos + sizeCell * 0.5f, combinedHeight[numCell], zPos + sizeCell * 0.33f);
                                 InstantiatePrefab(prefabPos, parentPrefab);
                             }
-                            else
+                            Triangle(parentCell, triangleUpTriangles);
+                        }
+                        else
+                        {
+                            if (prefabOptions && prefabSource != null && cellPrefab[numCell])
                             {
                                 numPrefab++;
                                 Vector3 prefabPos = new Vector3(xPos + sizeCell * 0.5f, combinedHeight[numCell], zPos + sizeCell * 0.67f);
                                 InstantiatePrefab(prefabPos, parentPrefab);
                             }
+                            Triangle(parentCell, triangleDownTriangles);
                         }
-
-                        Triangle(parentCell, triangleTriangles);
 
                         xPos += sizeCell / 2 + gutterGrid;
                         numCell++;
@@ -297,7 +293,10 @@ public class GridSpawner : EditorWindow
                     }
                     xPos = 0f;
                     zPos += sizeCell + gutterGrid;
-                    triangleUp = !triangleUp;
+                    if (columnsGrid % 2 == 0)
+                    {
+                        triangleUp = !triangleUp;
+                    }
                     row++;
                 }
                 ResetValues();
