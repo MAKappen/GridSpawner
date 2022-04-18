@@ -608,6 +608,7 @@ public class GridSpawner : EditorWindow
         numPrefab = 0;
         cellAmount = 0f;
         currentRandomCell = 0;
+        triangleUp = false;
 
         int cell = 0;
         while (cell < cellAmount)
